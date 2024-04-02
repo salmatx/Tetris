@@ -11,6 +11,5 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-./build
-./doc
-./.idea
+build
+.idea
