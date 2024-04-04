@@ -19,44 +19,46 @@ public:
     Piece(Piece&& other) noexcept;
     Piece& operator=(const Piece& other);
     Piece& operator=(Piece&& other) noexcept;
-    Piece* FastRotation();
+    Piece* FastRotation() const;
     uint16_t GetDim() const;
+    uint16_t GetSize() const;
+    tetrino* GetPiece() const;
     static void MakeAllRotations();
-    static void Cleanup(); //deallocates memory inside all_rotations, to be called at the end of game
+    static void Cleanup(); //deallocates memory inside kAllRotations, to be called at the end of game
 
 private:
     struct Tetrinos {
-        static constexpr tetrino square[]{
+        static constexpr tetrino kSquare[]{
                 1, 1,
                 1, 1
         };
-        static constexpr tetrino bar[]{
+        static constexpr tetrino kBar[]{
                 0, 0, 0, 0,
                 1, 1, 1, 1,
                 0, 0, 0, 0,
                 0, 0, 0, 0
         };
-        static constexpr tetrino pyramid[]{
+        static constexpr tetrino kPyramid[]{
                 0, 0, 0,
                 1, 1, 1,
                 0, 1, 0
         };
-        static constexpr tetrino s_shape[]{
+        static constexpr tetrino kSShape[]{
                 0, 1, 1,
                 1, 1, 0,
                 0, 0, 0
         };
-        static constexpr tetrino z_shape[]{
+        static constexpr tetrino kZShape[]{
                 1, 1, 0,
                 0, 1, 1,
                 0, 0, 0
         };
-        static constexpr tetrino l_shape[]{
+        static constexpr tetrino kLShape[]{
                 0, 1, 0,
                 0, 1, 0,
                 0, 1, 1
         };
-        static constexpr tetrino j_shape[]{
+        static constexpr tetrino kJShape[]{
                 0, 1, 0,
                 0, 1, 0,
                 1, 1, 0
@@ -65,6 +67,6 @@ private:
     tetrino* shape_;
     uint16_t dim_{};
     Piece* next_ = nullptr;
-    static std::unordered_map<Shape, std::vector<std::unique_ptr<Piece>>> all_rotations;
+    static std::unordered_map<Shape, std::vector<std::unique_ptr<Piece>>> kAllRotations;
     static void ComputeNextRotation(const Piece& piece, Shape shape);
 };

@@ -5,51 +5,51 @@
 
 const std::vector<Shape> shapes{kSquare, kBar, kPyramid, kSShape, kZShape,
                                 kLShape, kJShape, kNumOfShapes};
-std::unordered_map<Shape, std::vector<std::unique_ptr<Piece>>> Piece::all_rotations{};
+std::unordered_map<Shape, std::vector<std::unique_ptr<Piece>>> Piece::kAllRotations{};
 
 
 Piece::Piece(Shape shape) {
     switch (shape) {
         case Shape::kSquare:
-            this->shape_ = (tetrino*) Tetrinos::square;
+            this->shape_ = (tetrino*) Tetrinos::kSquare;
             this->dim_ = static_cast<uint16_t>(sqrt(
-                    sizeof(Tetrinos::square) / sizeof(*Tetrinos::square)));
+                    sizeof(Tetrinos::kSquare) / sizeof(*Tetrinos::kSquare)));
             break;
         case Shape::kBar:
-            this->shape_ = (tetrino*) Tetrinos::bar;
+            this->shape_ = (tetrino*) Tetrinos::kBar;
             this->dim_ = static_cast<uint16_t>(sqrt(
-                    sizeof(Tetrinos::bar) / sizeof(*Tetrinos::bar)));
+                    sizeof(Tetrinos::kBar) / sizeof(*Tetrinos::kBar)));
             break;
         case Shape::kSShape:
-            this->shape_ = (tetrino*) Tetrinos::s_shape;
+            this->shape_ = (tetrino*) Tetrinos::kSShape;
             this->dim_ = static_cast<uint16_t>(sqrt(
-                    sizeof(Tetrinos::s_shape) / sizeof(*Tetrinos::s_shape)));
+                    sizeof(Tetrinos::kSShape) / sizeof(*Tetrinos::kSShape)));
             break;
         case Shape::kZShape:
-            this->shape_ = (tetrino*) Tetrinos::z_shape;
+            this->shape_ = (tetrino*) Tetrinos::kZShape;
             this->dim_ = static_cast<uint16_t>(sqrt(
-                    sizeof(Tetrinos::z_shape) / sizeof(*Tetrinos::z_shape)));
+                    sizeof(Tetrinos::kZShape) / sizeof(*Tetrinos::kZShape)));
             break;
         case Shape::kPyramid:
-            this->shape_ = (tetrino*) Tetrinos::pyramid;
+            this->shape_ = (tetrino*) Tetrinos::kPyramid;
             this->dim_ = static_cast<uint16_t>(sqrt(
-                    sizeof(Tetrinos::pyramid) / sizeof(*Tetrinos::pyramid)));
+                    sizeof(Tetrinos::kPyramid) / sizeof(*Tetrinos::kPyramid)));
             break;
         case Shape::kLShape:
-            this->shape_ = (tetrino*) Tetrinos::l_shape;
+            this->shape_ = (tetrino*) Tetrinos::kLShape;
             this->dim_ = static_cast<uint16_t>(sqrt(
-                    sizeof(Tetrinos::l_shape) / sizeof(*Tetrinos::l_shape)));
+                    sizeof(Tetrinos::kLShape) / sizeof(*Tetrinos::kLShape)));
             break;
         case Shape::kJShape:
-            this->shape_ = (tetrino*) Tetrinos::j_shape;
-            this->dim_ = sizeof(Tetrinos::j_shape) / sizeof(*Tetrinos::j_shape);
+            this->shape_ = (tetrino*) Tetrinos::kJShape;
+            this->dim_ = sizeof(Tetrinos::kJShape) / sizeof(*Tetrinos::kJShape);
             break;
         default:
             this->shape_ = nullptr;
             break;
     }
-    if (Piece::all_rotations.size() == Shape::kNumOfShapes * rotations_count) {
-        this->next_ = Piece::all_rotations.at(shape).at(1).get();
+    if (Piece::kAllRotations.size() == Shape::kNumOfShapes * rotations_count) {
+        this->next_ = Piece::kAllRotations.at(shape).at(1).get();
     }
 }
 
@@ -71,21 +71,21 @@ void Piece::MakeAllRotations() {
         auto res = index < (rotations_count - 1) ? ++index : 0;
         return res;
     };
-    for (int i = 0; i < rotations_count; i++) {
+    for (int i = 0; i < rotations_count; ++i) {
         for (const auto& shape: shapes) {
             auto piece = std::make_unique<Piece>(shape);
-            Piece::all_rotations[shape].emplace_back(std::move(piece));
-            Piece::all_rotations.at(shape).at(i)->shape_ = new tetrino[
-            Piece::all_rotations.at(shape).back()->dim_ *
-            Piece::all_rotations.at(shape).back()->dim_];
-            Piece::ComputeNextRotation(*Piece::all_rotations.at(shape).at(i),
+            Piece::kAllRotations[shape].emplace_back(std::move(piece));
+            Piece::kAllRotations.at(shape).at(i)->shape_ = new tetrino[
+            Piece::kAllRotations.at(shape).back()->dim_ *
+            Piece::kAllRotations.at(shape).back()->dim_];
+            Piece::ComputeNextRotation(*Piece::kAllRotations.at(shape).at(i),
                                        shape);
         }
     }
-    for (int i = 0; i < rotations_count; i++) {
+    for (int i = 0; i < rotations_count; ++i) {
         for (const auto& shape: shapes) {
-            Piece::all_rotations.at(shape).at(
-                    i)->next_ = Piece::all_rotations.at(shape).at(
+            Piece::kAllRotations.at(shape).at(
+                    i)->next_ = Piece::kAllRotations.at(shape).at(
                     point_to_next(i)).get();
         }
     }
@@ -124,13 +124,21 @@ uint16_t Piece::GetDim() const {
 }
 
 void Piece::Cleanup() {
-    for (const auto& [key, value]: Piece::all_rotations) {
-        for (const auto& piece: Piece::all_rotations.at(key)) {
+    for (const auto& [key, value]: Piece::kAllRotations) {
+        for (const auto& piece: Piece::kAllRotations.at(key)) {
             delete[] piece->shape_;
         }
     }
 }
 
-Piece* Piece::FastRotation() {
+Piece* Piece::FastRotation() const {
     return this->next_;
+}
+
+tetrino* Piece::GetPiece() const {
+    return this->shape_;
+}
+
+uint16_t Piece::GetSize() const {
+    return this->dim_ * this->dim_;
 }
