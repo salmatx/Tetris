@@ -22,7 +22,7 @@ public:
     Piece* FastRotation();
     uint16_t GetDim() const;
     static void MakeAllRotations();
-    static void QuitGame(); //deallocates memory inside all_rotations, to be called at the end of game
+    static void Cleanup(); //deallocates memory inside all_rotations, to be called at the end of game
 
 private:
     struct Tetrinos {
@@ -67,6 +67,4 @@ private:
     Piece* next_ = nullptr;
     static std::unordered_map<Shape, std::vector<std::unique_ptr<Piece>>> all_rotations;
     static void ComputeNextRotation(const Piece& piece, Shape shape);
-
-
 };

@@ -123,7 +123,7 @@ uint16_t Piece::GetDim() const {
     return this->dim_;
 }
 
-void Piece::QuitGame() {
+void Piece::Cleanup() {
     for (const auto& [key, value]: Piece::all_rotations) {
         for (const auto& piece: Piece::all_rotations.at(key)) {
             delete[] piece->shape_;
