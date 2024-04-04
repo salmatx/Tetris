@@ -11,38 +11,38 @@ std::unordered_map<Shape, std::vector<std::unique_ptr<Piece>>> Piece::kAllRotati
 Piece::Piece(Shape shape) {
     switch (shape) {
         case Shape::kSquare:
-            this->shape_ = (tetrino*) Tetrinos::kSquare;
+            this->shape_ = (tetrino*) Tetrinos::square;
             this->dim_ = static_cast<uint16_t>(sqrt(
-                    sizeof(Tetrinos::kSquare) / sizeof(*Tetrinos::kSquare)));
+                    sizeof(Tetrinos::square) / sizeof(*Tetrinos::square)));
             break;
         case Shape::kBar:
-            this->shape_ = (tetrino*) Tetrinos::kBar;
+            this->shape_ = (tetrino*) Tetrinos::bar;
             this->dim_ = static_cast<uint16_t>(sqrt(
-                    sizeof(Tetrinos::kBar) / sizeof(*Tetrinos::kBar)));
+                    sizeof(Tetrinos::bar) / sizeof(*Tetrinos::bar)));
             break;
         case Shape::kSShape:
-            this->shape_ = (tetrino*) Tetrinos::kSShape;
+            this->shape_ = (tetrino*) Tetrinos::s_shape;
             this->dim_ = static_cast<uint16_t>(sqrt(
-                    sizeof(Tetrinos::kSShape) / sizeof(*Tetrinos::kSShape)));
+                    sizeof(Tetrinos::s_shape) / sizeof(*Tetrinos::s_shape)));
             break;
         case Shape::kZShape:
-            this->shape_ = (tetrino*) Tetrinos::kZShape;
+            this->shape_ = (tetrino*) Tetrinos::z_shape;
             this->dim_ = static_cast<uint16_t>(sqrt(
-                    sizeof(Tetrinos::kZShape) / sizeof(*Tetrinos::kZShape)));
+                    sizeof(Tetrinos::z_shape) / sizeof(*Tetrinos::z_shape)));
             break;
         case Shape::kPyramid:
-            this->shape_ = (tetrino*) Tetrinos::kPyramid;
+            this->shape_ = (tetrino*) Tetrinos::pyramid;
             this->dim_ = static_cast<uint16_t>(sqrt(
-                    sizeof(Tetrinos::kPyramid) / sizeof(*Tetrinos::kPyramid)));
+                    sizeof(Tetrinos::pyramid) / sizeof(*Tetrinos::pyramid)));
             break;
         case Shape::kLShape:
-            this->shape_ = (tetrino*) Tetrinos::kLShape;
+            this->shape_ = (tetrino*) Tetrinos::l_shape;
             this->dim_ = static_cast<uint16_t>(sqrt(
-                    sizeof(Tetrinos::kLShape) / sizeof(*Tetrinos::kLShape)));
+                    sizeof(Tetrinos::l_shape) / sizeof(*Tetrinos::l_shape)));
             break;
         case Shape::kJShape:
-            this->shape_ = (tetrino*) Tetrinos::kJShape;
-            this->dim_ = sizeof(Tetrinos::kJShape) / sizeof(*Tetrinos::kJShape);
+            this->shape_ = (tetrino*) Tetrinos::j_shape;
+            this->dim_ = sizeof(Tetrinos::j_shape) / sizeof(*Tetrinos::j_shape);
             break;
         default:
             this->shape_ = nullptr;

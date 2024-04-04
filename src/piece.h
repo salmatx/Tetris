@@ -28,37 +28,37 @@ public:
 
 private:
     struct Tetrinos {
-        static constexpr tetrino kSquare[]{
+        static constexpr tetrino square[]{
                 1, 1,
                 1, 1
         };
-        static constexpr tetrino kBar[]{
+        static constexpr tetrino bar[]{
                 0, 0, 0, 0,
                 1, 1, 1, 1,
                 0, 0, 0, 0,
                 0, 0, 0, 0
         };
-        static constexpr tetrino kPyramid[]{
+        static constexpr tetrino pyramid[]{
                 0, 0, 0,
                 1, 1, 1,
                 0, 1, 0
         };
-        static constexpr tetrino kSShape[]{
+        static constexpr tetrino s_shape[]{
                 0, 1, 1,
                 1, 1, 0,
                 0, 0, 0
         };
-        static constexpr tetrino kZShape[]{
+        static constexpr tetrino z_shape[]{
                 1, 1, 0,
                 0, 1, 1,
                 0, 0, 0
         };
-        static constexpr tetrino kLShape[]{
+        static constexpr tetrino l_shape[]{
                 0, 1, 0,
                 0, 1, 0,
                 0, 1, 1
         };
-        static constexpr tetrino kJShape[]{
+        static constexpr tetrino j_shape[]{
                 0, 1, 0,
                 0, 1, 0,
                 1, 1, 0

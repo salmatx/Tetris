@@ -20,13 +20,13 @@ private:
     RGBA color_;
 
     struct Schemes {
-        static constexpr RGBA kWhite[]{
+        static constexpr RGBA white_color[]{
                 {0xFF, 0xFF, 0xFF, 0xFF}
         };
-        static constexpr RGBA kBlack[] = {
+        static constexpr RGBA black_color[] = {
                 {0x00, 0x00, 0x00, 0x00}
         };
-        static constexpr RGBA kBaseColors[] = {
+        static constexpr RGBA base_colors[] = {
                 {0x28, 0x28, 0x28, 0xFF},
                 {0x2D, 0x99, 0x99, 0xFF},
                 {0x99, 0x99, 0x2D, 0xFF},
@@ -36,7 +36,7 @@ private:
                 {0x2D, 0x63, 0x99, 0xFF},
                 {0x99, 0x63, 0x2D, 0xFF}
         };
-        static constexpr RGBA kLightColors[] = {
+        static constexpr RGBA light_colors[] = {
                 {0x28, 0x28, 0x28, 0xFF},
                 {0x44, 0xE5, 0xE5, 0xFF},
                 {0xE5, 0xE5, 0x44, 0xFF},
@@ -46,7 +46,7 @@ private:
                 {0x44, 0x95, 0xE5, 0xFF},
                 {0xE5, 0x95, 0x44, 0xFF}
         };
-        static constexpr RGBA kDarkColors[] = {
+        static constexpr RGBA dark_colors[] = {
                 {0x28, 0x28, 0x28, 0xFF},
                 {0x1E, 0x66, 0x66, 0xFF},
                 {0x66, 0x66, 0x1E, 0xFF},
