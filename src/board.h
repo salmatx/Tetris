@@ -6,6 +6,8 @@
 #include <vector>
 #include <cstdint>
 
+namespace game {
+
 class Board {
 public:
     Board();
@@ -25,3 +27,5 @@ private:
     uint8_t GetValue(const int& row, const int& col);
     bool CheckPieceValid(const PieceState& piece);
 };
+
+}

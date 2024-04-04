@@ -1,6 +1,8 @@
 #include <cassert>
 #include "board.h"
 
+namespace game {
+
 Board::Board(size_t width, size_t height) :
         height_(height), width_(width),
         board_(width, std::vector<uint8_t>(height)) {}
@@ -34,4 +36,6 @@ bool Board::CheckPieceValid(const Board::PieceState& piece) {
         }
     }
     return true;
+}
+
 }

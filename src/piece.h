@@ -5,9 +5,13 @@
 #include <memory>
 #include <unordered_map>
 
+namespace game {
+
 using tetrino = uint8_t;
 
-enum class Shape {kSquare, kBar, kPyramid, kSShape, kZShape, kLShape, kJShape, kNumOfShapes};
+enum class Shape {
+    kSquare, kBar, kPyramid, kSShape, kZShape, kLShape, kJShape, kNumOfShapes
+};
 
 constexpr uint8_t rotations_count = 4; //rotating by 90deg
 
@@ -24,7 +28,8 @@ public:
     uint16_t GetSize() const;
     tetrino* GetPiece() const;
     static void MakeAllRotations();
-    static void Cleanup(); //deallocates memory inside kAllRotations, to be called at the end of game
+    static void
+    Cleanup(); //deallocates memory inside kAllRotations, to be called at the end of game
 
 private:
     struct Tetrinos {
@@ -70,3 +75,5 @@ private:
     static std::unordered_map<Shape, std::vector<std::unique_ptr<Piece>>> kAllRotations;
     static void ComputeNextRotation(const Piece& piece, Shape shape);
 };
+
+}

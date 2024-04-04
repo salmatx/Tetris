@@ -2,7 +2,11 @@
 
 #include <cstdint>
 
-enum class ColorSchemes {kWhite, kBlack, kBaseColors, kLightColors, kDarkColors};
+namespace game {
+
+enum class ColorSchemes {
+    kWhite, kBlack, kBaseColors, kLightColors, kDarkColors
+};
 
 class Color {
 public:
@@ -58,3 +62,5 @@ private:
         };
     };
 };
+
+}

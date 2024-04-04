@@ -1,5 +1,7 @@
 #include "color.h"
 
+namespace game {
+
 Color::Color(ColorSchemes color_scheme, uint8_t shade) {
     switch (color_scheme) {
         case ColorSchemes::kWhite:
@@ -22,4 +24,6 @@ Color::Color(ColorSchemes color_scheme, uint8_t shade) {
 
 Color::RGBA Color::GetColor() {
     return color_;
+}
+
 }

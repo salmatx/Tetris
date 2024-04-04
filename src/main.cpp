@@ -5,6 +5,6 @@
 //#define NDEBUG //uncomment in release to disable assert()
 
 int main() {
-    std::atexit(Piece::Cleanup);
+    std::atexit(game::Piece::Cleanup);
     return 0;
 }

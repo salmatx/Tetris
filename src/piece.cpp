@@ -3,8 +3,10 @@
 #include <utility>
 #include "piece.h"
 
+namespace game {
+
 const std::vector<Shape> shapes{Shape::kSquare, Shape::kBar, Shape::kPyramid,
-                                Shape::kSShape, Shape::kZShape,Shape::kLShape,
+                                Shape::kSShape, Shape::kZShape, Shape::kLShape,
                                 Shape::kJShape, Shape::kNumOfShapes};
 std::unordered_map<Shape, std::vector<std::unique_ptr<Piece>>> Piece::kAllRotations{};
 
@@ -49,7 +51,8 @@ Piece::Piece(Shape shape) {
             this->shape_ = nullptr;
             break;
     }
-    if (Piece::kAllRotations.size() == static_cast<int>(Shape::kNumOfShapes) * rotations_count) {
+    if (Piece::kAllRotations.size() ==
+        static_cast<int>(Shape::kNumOfShapes) * rotations_count) {
         this->next_ = Piece::kAllRotations.at(shape).at(1).get();
     }
 }
@@ -142,4 +145,6 @@ tetrino* Piece::GetPiece() const {
 
 uint16_t Piece::GetSize() const {
     return this->dim_ * this->dim_;
+}
+
 }

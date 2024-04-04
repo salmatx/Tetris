@@ -2,16 +2,22 @@
 
 #include <cstddef>
 
+namespace game {
+
 class Game {
 public:
-    enum class InputTypes {kLeft, kRight, kRotate, kFastDrop, kHardDrop};
+    enum class InputTypes {
+        kLeft, kRight, kRotate, kFastDrop, kHardDrop
+    };
 
     Game(int left_move, int right_move, int rotation, int fast_drop,
          int hard_drop);
     void GameLoop(const InputTypes& input);
 
 private:
-    enum class GamePhase {kStartPhase, kPlayPhase, kLineRemovalPhase, kGameOverPhase};
+    enum class GamePhase {
+        kStartPhase, kPlayPhase, kLineRemovalPhase, kGameOverPhase
+    };
 
     struct Moves {
         int left;
@@ -28,3 +34,5 @@ private:
 
     void UpdateGameplay(const InputTypes& input);
 };
+
+}
