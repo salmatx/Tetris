@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-enum ColorSchemes {kWhite, kBlack, kBaseColors, kLightColors, kDarkColors};
+enum class ColorSchemes {kWhite, kBlack, kBaseColors, kLightColors, kDarkColors};
 
 class Color {
 public:
