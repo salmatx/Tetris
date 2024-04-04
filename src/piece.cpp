@@ -134,5 +134,3 @@ void Piece::QuitGame() {
 Piece* Piece::FastRotation() {
     return this->next_;
 }
-
-
