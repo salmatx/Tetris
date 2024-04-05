@@ -5,9 +5,13 @@ namespace game {
 
 Board::Board(size_t width, size_t height) :
         height_(height), width_(width),
-        board_(width, std::vector<uint8_t>(height)) {}
+        board_(width, std::vector<uint8_t>(height)) {
+    pieces_.reserve(20);
+}
 
-Board::Board() : board_(width_, std::vector<uint8_t>(height_)) {}
+Board::Board() : board_(width_, std::vector<uint8_t>(height_)) {
+    pieces_.reserve(20);
+}
 
 void Board::SetValue(const int& row, const int& col, const uint8_t value) {
     this->board_.at(col).at(row) = value;
@@ -36,6 +40,51 @@ bool Board::CheckPieceValid(const Board::PieceState& piece) {
         }
     }
     return true;
+}
+
+void Board::MakePiece(Shape shape, int offset_row, int offset_col) {
+    this->actual_piece_ = &pieces_.emplace_back(
+            PieceState{Piece{shape}, offset_row, offset_col});
+}
+
+void Board::MovePieceLeft() {
+    PieceState tmp = *this->actual_piece_;
+    --tmp.offset_col;
+    if (this->CheckPieceValid(tmp)) {
+        --this->actual_piece_->offset_col;
+    }
+}
+
+void Board::MovePieceRight() {
+    PieceState tmp = *this->actual_piece_;
+    ++tmp.offset_col;
+    if (this->CheckPieceValid(tmp)) {
+        ++this->actual_piece_->offset_col;
+    }
+}
+
+void Board::RotatePiece() {
+    PieceState tmp = *this->actual_piece_;
+    tmp.piece.FastRotation();
+    if (this->CheckPieceValid(tmp)) {
+        this->actual_piece_->piece.FastRotation();
+    }
+}
+
+void Board::MovePiece(MoveTypes move) {
+    switch (move) {
+        case MoveTypes::kLeft:
+            this->MovePieceLeft();
+            break;
+        case MoveTypes::kRight:
+            this->MovePieceRight();
+            break;
+        case MoveTypes::kRotate:
+            this->RotatePiece();
+            break;
+        default:
+            break;
+    }
 }
 
 }
