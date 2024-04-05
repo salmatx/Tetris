@@ -14,7 +14,7 @@ public:
     Board();
     Board(size_t width, size_t height);
     void MakePiece(Shape shape, int offset_row, int offset_col);
-    void MovePiece(MoveTypes move);
+    void MovePiece(MoveTypes& move);
 
 private:
     struct PieceState {

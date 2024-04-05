@@ -71,7 +71,7 @@ void Board::RotatePiece() {
     }
 }
 
-void Board::MovePiece(MoveTypes move) {
+void Board::MovePiece(MoveTypes& move) {
     switch (move) {
         case MoveTypes::kLeft:
             this->MovePieceLeft();
