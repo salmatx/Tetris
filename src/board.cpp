@@ -5,13 +5,9 @@ namespace game {
 
 Board::Board(size_t width, size_t height) :
         height_(height), width_(width),
-        board_(width, std::vector<uint8_t>(height)) {
-    pieces_.reserve(20);
-}
+        board_(width, std::vector<uint8_t>(height)) {}
 
-Board::Board() : board_(width_, std::vector<uint8_t>(height_)) {
-    pieces_.reserve(20);
-}
+Board::Board() : board_(width_, std::vector<uint8_t>(height_)) {}
 
 void Board::SetValue(const int& row, const int& col, const uint8_t value) {
     this->board_.at(col).at(row) = value;
@@ -43,8 +39,7 @@ bool Board::CheckPieceValid(const Board::PieceState& piece) {
 }
 
 void Board::MakePiece(Shape shape, int offset_row, int offset_col) {
-    this->actual_piece_ = &pieces_.emplace_back(
-            PieceState{Piece{shape}, offset_row, offset_col});
+    this->actual_piece_ = std::make_unique<PieceState>(PieceState{Piece{shape}, offset_row, offset_col});
 }
 
 void Board::MovePieceLeft() {
@@ -71,7 +66,7 @@ void Board::RotatePiece() {
     }
 }
 
-void Board::MovePiece(MoveTypes& move) {
+void Board::MovePiece(const MoveTypes& move) {
     switch (move) {
         case MoveTypes::kLeft:
             this->MovePieceLeft();
