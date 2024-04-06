@@ -13,8 +13,8 @@ class Board {
 public:
     Board();
     Board(size_t width, size_t height);
-    void MakePiece(Shape shape, int offset_row, int offset_col);
     void MovePiece(const MoveTypes& move);
+    void SoftDrop();
 
 private:
     struct PieceState {
@@ -33,6 +33,9 @@ private:
     void MovePieceLeft();
     void MovePieceRight();
     void RotatePiece();
+    void MergePieceIntoBoard();
+    void MakePiece(Shape shape, int offset_row, int offset_col);
+    Shape SelectRandomPiece();
 };
 
 }
