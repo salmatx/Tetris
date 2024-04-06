@@ -1,5 +1,7 @@
 #pragma once
 
+#include "common.h"
+
 #include <cstdint>
 #include <vector>
 #include <memory>
@@ -8,10 +10,6 @@
 namespace game {
 
 using tetrino = uint8_t;
-
-enum class Shape {
-    kSquare, kBar, kPyramid, kSShape, kZShape, kLShape, kJShape, kNumOfShapes
-};
 
 constexpr uint8_t rotations_count = 4; //rotating by 90deg
 
