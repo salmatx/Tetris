@@ -2,7 +2,7 @@
 
 namespace game {
 
-Color::Color(ColorSchemes color_scheme, uint8_t shade) {
+ColorScheme::ColorScheme(ColorSchemes color_scheme, uint8_t shade) {
     switch (color_scheme) {
         case ColorSchemes::kWhite:
             this->color_ = Schemes::white_color[0];
@@ -22,8 +22,20 @@ Color::Color(ColorSchemes color_scheme, uint8_t shade) {
     }
 }
 
-Color::RGBA Color::GetColor() {
-    return color_;
+uint8_t ColorScheme::GetRValue() {
+    return this->color_.r;
+}
+
+uint8_t ColorScheme::GetGValue() {
+    return this->color_.g;
+}
+
+uint8_t ColorScheme::GetBValue() {
+    return this->color_.b;
+}
+
+uint8_t ColorScheme::GetAValue() {
+    return this->color_.a;
 }
 
 }

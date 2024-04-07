@@ -8,8 +8,15 @@ enum class ColorSchemes {
     kWhite, kBlack, kBaseColors, kLightColors, kDarkColors
 };
 
-class Color {
+class ColorScheme {
 public:
+    ColorScheme(ColorSchemes color_scheme, uint8_t shade = 0);
+    uint8_t GetRValue();
+    uint8_t GetGValue();
+    uint8_t GetBValue();
+    uint8_t GetAValue();
+
+private:
     struct RGBA {
         uint8_t r;
         uint8_t g;
@@ -17,10 +24,6 @@ public:
         uint8_t a;
     };
 
-    Color(ColorSchemes color_scheme, uint8_t shade);
-    RGBA GetColor();
-
-private:
     RGBA color_;
 
     struct Schemes {
