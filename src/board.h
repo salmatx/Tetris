@@ -14,7 +14,7 @@ public:
     Board();
     Board(size_t width, size_t height);
     void MovePiece(const MoveTypes& move);
-    void SoftDrop();
+    bool SoftDrop();
 
 private:
     struct PieceState {

@@ -92,13 +92,15 @@ void Board::MovePiece(const MoveTypes& move) {
     }
 }
 
-void Board::SoftDrop() {
+bool Board::SoftDrop() {
     ++this->actual_piece_->offset_row;
     if (!this->CheckPieceValid(*this->actual_piece_)) {
         --this->actual_piece_->offset_row;
         this->MergePieceIntoBoard();
         this->MakePiece(this->SelectRandomPiece(), 0, this->width_ / 2);
+        return false;
     }
+    return true;
 }
 
 void Board::MergePieceIntoBoard() {
