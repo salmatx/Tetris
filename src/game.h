@@ -4,27 +4,24 @@
 #include "board.h"
 
 #include <cstddef>
+#include <chrono>
 
 namespace game {
 
 class Game {
 public:
-    Game(int left_move, int right_move, int rotation, int fast_drop,
-         int hard_drop);
-    void UpdateGame(const MoveTypes& input);
+    Game();
+    ~Game();
+    void UpdateGame(const MoveTypes& input, const GameState& game_state);
     void SetBoardSize(const size_t width, const size_t height);
+    uint16_t GetPieceSize();
+    uint8_t* GetPiece();
+    int GetPieceRowPosition();
+    int GetPieceColumnPosition();
 
 private:
     enum class GamePhase {
         kStartPhase, kPlayPhase, kLineRemovalPhase, kGameOverPhase
-    };
-
-    struct Moves {
-        int left;
-        int right;
-        int rotate;
-        int fast_drop;
-        int hard_drop;
     };
 
     const uint8_t kFramesPerDrop[30]{
@@ -35,7 +32,6 @@ private:
     const float kTargetSecondsPerFrame = 1.0f / 60.0f;
 
     std::unique_ptr<Board> board_;
-    Moves moves_;
     size_t points_ = 0;
     size_t level_ = 0;
     GamePhase game_phase_ = GamePhase::kStartPhase;
@@ -45,6 +41,7 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> current_time_;
 
     void UpdateGameplay(const MoveTypes& input);
+    void UpdateGameStart(const MoveTypes& input);
     float GetTimeToNextDrop();
     void DropPiece();
 };

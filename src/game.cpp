@@ -1,16 +1,9 @@
-#include <chrono>
 #include "game.h"
 
 namespace game {
 
-Game::Game(int left_move, int right_move, int rotation, int fast_drop,
-           int hard_drop) : board_(std::make_unique<Board>()) {
-    this->moves_.left = left_move;
-    this->moves_.right = right_move;
-    this->moves_.rotate = rotation;
-    this->moves_.fast_drop = fast_drop;
-    this->moves_.hard_drop = hard_drop;
-
+Game::Game() : board_(std::make_unique<Board>()) {
+    Piece::MakeAllRotations();
     this->start_time_ = std::chrono::steady_clock::now();
 }
 
@@ -36,13 +29,44 @@ void Game::DropPiece() {
     if (this->board_->SoftDrop()) {
         this->next_drop_time_ = this->time_duration_ + this->GetTimeToNextDrop();
     }
-
 }
 
-void Game::UpdateGame(const MoveTypes& input) {
+void Game::UpdateGame(const MoveTypes& input, const GameState& game_state) {
     this->current_time_ = std::chrono::steady_clock::now();
     this->time_duration_ =
             std::chrono::duration_cast<std::chrono::duration<float>>
                     (this->current_time_ -this->start_time_).count();
+    switch (game_state) {
+        case GameState::kGameStartPhase:
+            break;
+        case GameState::kGamePlayPhase:
+            this->UpdateGameplay(input);
+            break;
+        case GameState::kGameLinePhase:
+            break;
+        case GameState::kGameOverPhase:
+            break;
+    }
 }
+
+uint16_t Game::GetPieceSize() {
+    return this->board_->GetPieceSize();
+}
+
+uint8_t* Game::GetPiece() {
+    return this->board_->GetPiece();
+}
+
+int Game::GetPieceRowPosition() {
+    return this->board_->GetRowPosition();
+}
+
+int Game::GetPieceColumnPosition() {
+    return this->board_->GetColumnPosition();
+}
+
+Game::~Game() {
+    Piece::Cleanup();
+}
+
 }
