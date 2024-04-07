@@ -26,8 +26,7 @@ public:
     uint16_t GetSize() const;
     tetrino* GetPiece() const;
     static void MakeAllRotations();
-    static void
-    Cleanup(); //deallocates memory inside kAllRotations, to be called at the end of game
+    static void Cleanup(); //deallocates memory inside kAllRotations, to be called at the end of game
 
 private:
     struct Tetrinos {
@@ -37,41 +36,42 @@ private:
         };
         static constexpr tetrino bar[]{
                 0, 0, 0, 0,
-                1, 1, 1, 1,
+                2, 2, 2, 2,
                 0, 0, 0, 0,
                 0, 0, 0, 0
         };
         static constexpr tetrino pyramid[]{
                 0, 0, 0,
-                1, 1, 1,
-                0, 1, 0
+                3, 3, 3,
+                0, 3, 0
         };
         static constexpr tetrino s_shape[]{
-                0, 1, 1,
-                1, 1, 0,
+                0, 4, 4,
+                4, 4, 0,
                 0, 0, 0
         };
         static constexpr tetrino z_shape[]{
-                1, 1, 0,
-                0, 1, 1,
+                5, 5, 0,
+                0, 5, 5,
                 0, 0, 0
         };
         static constexpr tetrino l_shape[]{
-                0, 1, 0,
-                0, 1, 0,
-                0, 1, 1
+                0, 6, 0,
+                0, 6, 0,
+                0, 6, 6
         };
         static constexpr tetrino j_shape[]{
-                0, 1, 0,
-                0, 1, 0,
-                1, 1, 0
+                0, 7, 0,
+                0, 7, 0,
+                7, 7, 0
         };
     };
     tetrino* shape_;
-    uint16_t dim_{};
+    uint16_t dim_;
     Piece* next_ = nullptr;
+    static bool all_rotations_computed_;
     static std::unordered_map<Shape, std::vector<std::unique_ptr<Piece>>> kAllRotations;
-    static void ComputeNextRotation(const Piece& piece, Shape shape);
+    static void ComputeNextRotation(Piece* rotated_piece, Piece* prev_piece);
 };
 
 }
