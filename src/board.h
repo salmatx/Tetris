@@ -15,6 +15,10 @@ public:
     Board(size_t width, size_t height);
     void MovePiece(const MoveTypes& move);
     bool SoftDrop();
+    uint8_t* GetPiece();
+    int GetRowPosition();
+    int GetColumnPosition();
+    uint16_t GetPieceSize();
 
 private:
     struct PieceState {

@@ -7,7 +7,7 @@ namespace game {
 using RandGenType = std::mt19937;
 
 RandGenType rand_gen;
-std::uniform_int_distribution<uint32_t> uniform_dist(0, static_cast<int>(game::Shape::kNumOfShapes));
+std::uniform_int_distribution<uint32_t> uniform_dist(0, static_cast<int>(game::Shape::kNumOfShapes) - 1);
 
 Board::Board(size_t width, size_t height) :
         height_(height), width_(width),
@@ -30,7 +30,7 @@ uint8_t Board::GetValue(const int& row, const int& col) {
 bool Board::CheckPieceValid(const Board::PieceState& piece) {
     assert(&piece.piece);
     tetrino* shape = piece.piece.GetPiece();
-    uint16_t size = piece.piece.GetSize();
+    uint16_t size = piece.piece.GetDim();
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
             uint8_t value = *shape++;
@@ -70,9 +70,9 @@ void Board::MovePieceRight() {
 
 void Board::RotatePiece() {
     PieceState tmp = *this->actual_piece_;
-    tmp.piece.FastRotation();
+    tmp.piece = *tmp.piece.FastRotation();
     if (this->CheckPieceValid(tmp)) {
-        this->actual_piece_->piece.FastRotation();
+        this->actual_piece_->piece = *this->actual_piece_->piece.FastRotation();
     }
 }
 
@@ -84,7 +84,7 @@ void Board::MovePiece(const MoveTypes& move) {
         case MoveTypes::kRight:
             this->MovePieceRight();
             break;
-        case MoveTypes::kRotate:
+        case MoveTypes::kUp:
             this->RotatePiece();
             break;
         default:
@@ -93,6 +93,9 @@ void Board::MovePiece(const MoveTypes& move) {
 }
 
 bool Board::SoftDrop() {
+    if (this->actual_piece_ == nullptr) {
+        this->MakePiece(this->SelectRandomPiece(), 0, this->width_ / 2);
+    }
     ++this->actual_piece_->offset_row;
     if (!this->CheckPieceValid(*this->actual_piece_)) {
         --this->actual_piece_->offset_row;
@@ -105,7 +108,7 @@ bool Board::SoftDrop() {
 
 void Board::MergePieceIntoBoard() {
     tetrino* shape = this->actual_piece_->piece.GetPiece();
-    uint16_t size = this->actual_piece_->piece.GetSize();
+    uint16_t size = this->actual_piece_->piece.GetDim();
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
             uint8_t value = *shape++;
@@ -121,6 +124,22 @@ void Board::MergePieceIntoBoard() {
 Shape Board::SelectRandomPiece() {
     int number = uniform_dist( rand_gen);
     return static_cast<game::Shape>(number);
+}
+
+uint8_t* Board::GetPiece() {
+    return this->actual_piece_->piece.GetPiece();
+}
+
+int Board::GetRowPosition() {
+    return this->actual_piece_->offset_row;
+}
+
+int Board::GetColumnPosition() {
+    return this->actual_piece_->offset_col;
+}
+
+uint16_t Board::GetPieceSize() {
+    return this->actual_piece_->piece.GetDim();
 }
 
 }
