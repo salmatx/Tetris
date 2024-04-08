@@ -11,20 +11,20 @@ std::uniform_int_distribution<uint32_t> uniform_dist(0, static_cast<int>(game::S
 
 Board::Board(size_t width, size_t height) :
         height_(height), width_(width),
-        board_(width, std::vector<uint8_t>(height)) {
+        board_(height, std::vector<uint8_t>(width)) {
     rand_gen.seed(time(nullptr));
 }
 
-Board::Board() : board_(width_, std::vector<uint8_t>(height_)) {
+Board::Board() : board_(height_, std::vector<uint8_t>(width_)) {
     rand_gen.seed(time(nullptr));
 }
 
 void Board::SetValue(const int& row, const int& col, const uint8_t value) {
-    this->board_.at(col).at(row) = value;
+    this->board_.at(row).at(col) = value;
 }
 
 uint8_t Board::GetValue(const int& row, const int& col) {
-    return this->board_.at(col).at(row);
+    return this->board_.at(row).at(col);
 }
 
 bool Board::CheckPieceValid(const Board::PieceState& piece) {
@@ -36,7 +36,7 @@ bool Board::CheckPieceValid(const Board::PieceState& piece) {
             uint8_t value = *shape++;
             if (value) {
                 int board_row = piece.offset_row + i;
-                int board_col = piece.offset_row + j;
+                int board_col = piece.offset_col + j;
                 if (board_row < 0) return false;
                 if (board_row >= this->height_) return false;
                 if (board_col < 0) return false;
@@ -98,6 +98,7 @@ bool Board::SoftDrop() {
     }
     ++this->actual_piece_->offset_row;
     if (!this->CheckPieceValid(*this->actual_piece_)) {
+        this->CheckPieceValid(*this->actual_piece_);
         --this->actual_piece_->offset_row;
         this->MergePieceIntoBoard();
         this->MakePiece(this->SelectRandomPiece(), 0, this->width_ / 2);
@@ -114,7 +115,7 @@ void Board::MergePieceIntoBoard() {
             uint8_t value = *shape++;
             if (value) {
                 int board_row = this->actual_piece_->offset_row + i;
-                int board_col = this->actual_piece_->offset_row + j;
+                int board_col = this->actual_piece_->offset_col + j;
                 this->SetValue(board_row, board_col, value);
             }
         }
