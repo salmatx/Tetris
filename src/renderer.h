@@ -25,6 +25,7 @@ private:
 
     void RenderGame();
     void DrawPiece();
+    void DrawBoard();
     void DrawCell(int row, int col, int value, int offset_row, int offset_col) const;
 };
 

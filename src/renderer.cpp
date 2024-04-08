@@ -1,3 +1,4 @@
+#include <iostream>
 #include "renderer.h"
 #include "color.h"
 
@@ -10,7 +11,7 @@ Renderer::Renderer() : kScreenHeight_(720), kScreenWidth_(440) {
 }
 
 Renderer::Renderer(size_t width, size_t height)
-        : kScreenWidth_(width), kScreenHeight_(height) {
+        : kScreenHeight_(height), kScreenWidth_(width) {
     auto bgr_color = ColorScheme(ColorSchemes::kBlack);
     this->kBackgroundColor_ = {bgr_color.GetRValue(), bgr_color.GetGValue(),
                                bgr_color.GetBValue(), bgr_color.GetAValue()};
@@ -37,6 +38,7 @@ void Renderer::GameLoop(Game* game) {
 void Renderer::RenderGame() {
     BeginDrawing();
     ClearBackground(this->kBackgroundColor_);
+    this->DrawBoard();
     this->DrawPiece();
     EndDrawing();
 }
@@ -72,10 +74,12 @@ void Renderer::DrawCell(int row, int col, int value, int offset_row, int offset_
     int x = col * this->kGridSize_ + offset_col;
     int y = row * this->kGridSize_ + offset_row;
 
-    DrawRectangle(x, y, this->kGridSize_, this->kGridSize_, dark_color);
-    DrawRectangle(x + edge, y, this->kGridSize_ - edge, this->kGridSize_ - edge, light_color);
-    DrawRectangle(x + edge, y + edge, this->kGridSize_ - edge * 2,
-                  this->kGridSize_ - edge * 2, base_color);
+    if (value) {
+        DrawRectangle(x, y, this->kGridSize_, this->kGridSize_, dark_color);
+        DrawRectangle(x + edge, y, this->kGridSize_ - edge, this->kGridSize_ - edge, light_color);
+        DrawRectangle(x + edge, y + edge, this->kGridSize_ - edge * 2,
+                      this->kGridSize_ - edge * 2, base_color);
+    }
 }
 
 MoveTypes Renderer::GetMoveType() const {
@@ -86,6 +90,16 @@ MoveTypes Renderer::GetMoveType() const {
     if (IsKeyPressed(KEY_SPACE)) return MoveTypes::kSpace;
 
     return MoveTypes::kNone;
+}
+
+void Renderer::DrawBoard() {
+    auto board = this->game_->GetBoard();
+    for (int i = 0; i < this->game_->GetBoardHeight(); ++i) {
+        for (int j = 0; j < this->game_->GetBoardWidth(); ++j) {
+            uint8_t value = board.at(i).at(j);
+            this->DrawCell(i, j, value, 0, 0);
+        }
+    }
 }
 
 }
