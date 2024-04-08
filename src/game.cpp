@@ -13,7 +13,7 @@ void Game::SetBoardSize(const size_t width, const size_t height) {
 
 void Game::UpdateGameplay(const MoveTypes& input) {
     this->board_->MovePiece(input);
-    while (this->time_duration_ >= this->next_drop_time_) {
+    if (this->time_duration_ >= this->next_drop_time_) {
         this->DropPiece();
     }
 }
@@ -67,6 +67,18 @@ int Game::GetPieceColumnPosition() {
 
 Game::~Game() {
     Piece::Cleanup();
+}
+
+size_t Game::GetBoardHeight() {
+    return this->board_->GetBoardHeight();
+}
+
+size_t Game::GetBoardWidth() {
+    return this->board_->GetBoardWidth();
+}
+
+std::vector<std::vector<uint8_t>> Game::GetBoard() {
+    return this->board_->GetBoard();
 }
 
 }

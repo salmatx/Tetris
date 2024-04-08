@@ -18,6 +18,9 @@ public:
     uint8_t* GetPiece();
     int GetPieceRowPosition();
     int GetPieceColumnPosition();
+    size_t GetBoardHeight();
+    size_t GetBoardWidth();
+    std::vector<std::vector<uint8_t>> GetBoard();
 
 private:
     enum class GamePhase {
