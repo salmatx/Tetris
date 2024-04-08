@@ -98,7 +98,6 @@ bool Board::SoftDrop() {
     }
     ++this->actual_piece_->offset_row;
     if (!this->CheckPieceValid(*this->actual_piece_)) {
-        this->CheckPieceValid(*this->actual_piece_);
         --this->actual_piece_->offset_row;
         this->MergePieceIntoBoard();
         this->MakePiece(this->SelectRandomPiece(), 0, this->width_ / 2);
@@ -141,6 +140,18 @@ int Board::GetColumnPosition() {
 
 uint16_t Board::GetPieceSize() {
     return this->actual_piece_->piece.GetDim();
+}
+
+size_t Board::GetBoardHeight() {
+    return this->height_;
+}
+
+size_t Board::GetBoardWidth() {
+    return this->width_;
+}
+
+std::vector<std::vector<uint8_t>> Board::GetBoard() {
+    return this->board_;
 }
 
 }

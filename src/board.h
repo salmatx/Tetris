@@ -8,7 +8,7 @@
 #include <cstdint>
 
 namespace game {
-
+// TODO: Make copy constructor. For board getter return pointer to copy of board.
 class Board {
 public:
     Board();
@@ -19,6 +19,9 @@ public:
     int GetRowPosition();
     int GetColumnPosition();
     uint16_t GetPieceSize();
+    size_t GetBoardHeight();
+    size_t GetBoardWidth();
+    std::vector<std::vector<uint8_t>> GetBoard();
 
 private:
     struct PieceState {
