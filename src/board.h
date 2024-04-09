@@ -8,7 +8,7 @@
 #include <cstdint>
 
 namespace game {
-// TODO: Make copy constructor. For board getter return pointer to copy of board.
+
 class Board {
 public:
     Board();
@@ -43,6 +43,7 @@ private:
     void MergePieceIntoBoard();
     void MakePiece(Shape shape, int offset_row, int offset_col);
     Shape SelectRandomPiece();
+    void HardDrop();
 };
 
 }

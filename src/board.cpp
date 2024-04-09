@@ -87,6 +87,11 @@ void Board::MovePiece(const MoveTypes& move) {
         case MoveTypes::kUp:
             this->RotatePiece();
             break;
+        case MoveTypes::kDown:
+            SoftDrop();
+            break;
+        case MoveTypes::kSpace:
+            HardDrop();
         default:
             break;
     }
@@ -152,6 +157,10 @@ size_t Board::GetBoardWidth() {
 
 std::vector<std::vector<uint8_t>> Board::GetBoard() {
     return this->board_;
+}
+
+void Board::HardDrop() {
+    while (SoftDrop());
 }
 
 }
