@@ -22,6 +22,7 @@ public:
     size_t GetBoardHeight();
     size_t GetBoardWidth();
     std::vector<std::vector<uint8_t>> GetBoard();
+    int FindLinesToClear();
 
 private:
     struct PieceState {
@@ -31,11 +32,12 @@ private:
     };
     const size_t height_ = 22;
     const size_t width_ = 10;
+    std::vector<bool> lines_to_clear_;
     std::vector<std::vector<uint8_t>> board_;
     std::unique_ptr<PieceState> actual_piece_ = nullptr;
 
     void SetValue(const int& row, const int& col, const uint8_t value);
-    uint8_t GetValue(const int& row, const int& col);
+    uint8_t GetValue(const int& row, const int& col) const;
     bool CheckPieceValid(const PieceState& piece);
     void MovePieceLeft();
     void MovePieceRight();
@@ -44,6 +46,8 @@ private:
     void MakePiece(Shape shape, int offset_row, int offset_col);
     Shape SelectRandomPiece();
     void HardDrop();
+    bool CheckRowFilled(const int& row) const;
+    void ClearLines();
 };
 
 }

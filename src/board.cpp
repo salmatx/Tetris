@@ -23,7 +23,7 @@ void Board::SetValue(const int& row, const int& col, const uint8_t value) {
     this->board_.at(row).at(col) = value;
 }
 
-uint8_t Board::GetValue(const int& row, const int& col) {
+uint8_t Board::GetValue(const int& row, const int& col) const{
     return this->board_.at(row).at(col);
 }
 
@@ -161,6 +161,43 @@ std::vector<std::vector<uint8_t>> Board::GetBoard() {
 
 void Board::HardDrop() {
     while (SoftDrop());
+}
+
+bool Board::CheckRowFilled(const int& row) const {
+    for (int i = 0; i < this->width_; ++i) {
+        if (this->GetValue(row, i)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int Board::FindLinesToClear() {
+    int count = 0;
+    for (int i = 0; i < this->height_; ++i) {
+        this->lines_to_clear_[i] = this->CheckRowFilled(i);
+        ++count;
+    }
+    return count;
+}
+
+void Board::ClearLines() {
+    int src_row = this->height_ - 1;
+    for (int dest_row = src_row; dest_row >= 0; --dest_row) {
+        while (src_row > 0 && this->lines_to_clear_[src_row]) {
+            --src_row;
+        }
+        if (src_row < 0) {
+            std::fill(this->board_.at(dest_row).begin(),
+                      this->board_.at(dest_row).end(), 0);
+        }
+        else {
+            std::copy(this->board_.at(src_row).begin(),
+                      this->board_.at(src_row).end(),
+                      std::back_inserter(this->board_.at(dest_row)));
+            --src_row;
+        }
+    }
 }
 
 }
