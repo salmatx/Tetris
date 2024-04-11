@@ -28,6 +28,7 @@ public:
     uint8_t GetPendingLineCount();
     void SetClearedLineCount(uint8_t value);
     size_t GetClearedLineCount();
+    bool IsLineClearing(int index) const;
 
 private:
     struct PieceState {

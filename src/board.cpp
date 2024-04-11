@@ -220,4 +220,9 @@ size_t Board::GetClearedLineCount() {
     return this->cleared_line_count_;
 }
 
+bool Board::IsLineClearing(int index) const {
+    return this->lines_to_clear_[index];
+}
+
+
 }
