@@ -14,11 +14,7 @@ Board::Board(size_t width, size_t height) :
         board_(height, std::vector<uint8_t>(width)) {
     rand_gen.seed(time(nullptr));
     this->lines_to_clear_.reserve(this->height_);
-}
-
-Board::Board() : board_(height_, std::vector<uint8_t>(width_)) {
-    rand_gen.seed(time(nullptr));
-    this->lines_to_clear_.reserve(this->height_);
+    this->MakePiece(this->SelectRandomPiece(), 0, this->width_ / 2);
 }
 
 void Board::SetValue(const int& row, const int& col, const uint8_t value) {
@@ -100,9 +96,6 @@ void Board::MovePiece(const MoveTypes& move) {
 }
 
 bool Board::SoftDrop() {
-    if (this->actual_piece_ == nullptr) {
-        this->MakePiece(this->SelectRandomPiece(), 0, this->width_ / 2);
-    }
     ++this->actual_piece_->offset_row;
     if (!this->CheckPieceValid(*this->actual_piece_)) {
         --this->actual_piece_->offset_row;
@@ -222,6 +215,15 @@ size_t Board::GetClearedLineCount() {
 
 bool Board::IsLineClearing(int index) const {
     return this->lines_to_clear_[index];
+}
+
+bool Board::CheckRowEmpty(const int& row) const {
+    for (int i = 0; i < this->width_; ++i) {
+        if (this->GetValue(row, i)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 

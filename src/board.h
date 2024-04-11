@@ -11,7 +11,6 @@ namespace game {
 
 class Board {
 public:
-    Board();
     Board(size_t width, size_t height);
     void MovePiece(const MoveTypes& move);
     bool SoftDrop();
@@ -29,6 +28,7 @@ public:
     void SetClearedLineCount(uint8_t value);
     size_t GetClearedLineCount();
     bool IsLineClearing(int index) const;
+    bool CheckRowEmpty(const int& row) const;
 
 private:
     struct PieceState {
@@ -36,8 +36,8 @@ private:
         int offset_row;
         int offset_col;
     };
-    const size_t height_ = 22;
-    const size_t width_ = 10;
+    const size_t height_;
+    const size_t width_;
     std::vector<bool> lines_to_clear_;
     uint8_t pending_line_count_ = 0;
     size_t cleared_line_count_ = 0;
