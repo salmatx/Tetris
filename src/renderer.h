@@ -31,6 +31,7 @@ private:
     void DrawBoardOutline() const;
     void DrawLineClearingHighlight() const;
     void DrawString(Font font, float font_size, const char* msg, size_t x, size_t y, TextAlignment alignment, Color color) const;
+    void DrawStartScreen() const;
 };
 
 }
