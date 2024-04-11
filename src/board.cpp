@@ -13,10 +13,12 @@ Board::Board(size_t width, size_t height) :
         height_(height), width_(width),
         board_(height, std::vector<uint8_t>(width)) {
     rand_gen.seed(time(nullptr));
+    this->lines_to_clear_.reserve(this->height_);
 }
 
 Board::Board() : board_(height_, std::vector<uint8_t>(width_)) {
     rand_gen.seed(time(nullptr));
+    this->lines_to_clear_.reserve(this->height_);
 }
 
 void Board::SetValue(const int& row, const int& col, const uint8_t value) {
@@ -165,7 +167,7 @@ void Board::HardDrop() {
 
 bool Board::CheckRowFilled(const int& row) const {
     for (int i = 0; i < this->width_; ++i) {
-        if (this->GetValue(row, i)) {
+        if (!this->GetValue(row, i)) {
             return false;
         }
     }
@@ -176,7 +178,9 @@ int Board::FindLinesToClear() {
     int count = 0;
     for (int i = 0; i < this->height_; ++i) {
         this->lines_to_clear_[i] = this->CheckRowFilled(i);
-        ++count;
+        if (this->lines_to_clear_[i]) {
+            ++count;
+        }
     }
     return count;
 }
@@ -194,10 +198,26 @@ void Board::ClearLines() {
         else {
             std::copy(this->board_.at(src_row).begin(),
                       this->board_.at(src_row).end(),
-                      std::back_inserter(this->board_.at(dest_row)));
+                      this->board_.at(dest_row).begin());
             --src_row;
         }
     }
+}
+
+void Board::SetPendingLineCount(uint8_t value) {
+    this->pending_line_count_ = value;
+}
+
+uint8_t Board::GetPendingLineCount() {
+    return this->pending_line_count_;
+}
+
+void Board::SetClearedLineCount(uint8_t value) {
+    this->cleared_line_count_ = value;
+}
+
+size_t Board::GetClearedLineCount() {
+    return this->cleared_line_count_;
 }
 
 }

@@ -23,6 +23,11 @@ public:
     size_t GetBoardWidth();
     std::vector<std::vector<uint8_t>> GetBoard();
     int FindLinesToClear();
+    void ClearLines();
+    void SetPendingLineCount(uint8_t value);
+    uint8_t GetPendingLineCount();
+    void SetClearedLineCount(uint8_t value);
+    size_t GetClearedLineCount();
 
 private:
     struct PieceState {
@@ -33,6 +38,8 @@ private:
     const size_t height_ = 22;
     const size_t width_ = 10;
     std::vector<bool> lines_to_clear_;
+    uint8_t pending_line_count_ = 0;
+    size_t cleared_line_count_ = 0;
     std::vector<std::vector<uint8_t>> board_;
     std::unique_ptr<PieceState> actual_piece_ = nullptr;
 
@@ -47,7 +54,6 @@ private:
     Shape SelectRandomPiece();
     void HardDrop();
     bool CheckRowFilled(const int& row) const;
-    void ClearLines();
 };
 
 }

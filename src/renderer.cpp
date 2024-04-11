@@ -30,7 +30,7 @@ void Renderer::GameLoop(Game* game) {
     this->game_ = game;
     while (!WindowShouldClose()) {
         auto input = this->GetMoveType();
-        this->game_->UpdateGame(input, GameState::kGamePlayPhase);
+        this->game_->UpdateGame(input);
         RenderGame();
     }
 }
