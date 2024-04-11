@@ -21,6 +21,8 @@ public:
     size_t GetBoardHeight();
     size_t GetBoardWidth();
     std::vector<std::vector<uint8_t>> GetBoard();
+    bool IsLineClearing(int index) const;
+    GameState GetActualGamePhase() const;
 
 private:
     const uint8_t kFramesPerDrop[30]{

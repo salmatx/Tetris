@@ -19,6 +19,7 @@ void Game::UpdateGameplay(const MoveTypes& input) {
     this->board_->SetPendingLineCount(board_->FindLinesToClear());
     if (this->board_->GetPendingLineCount() > 0) {
         this->SetNextGamePhase(GameState::kGameLinePhase);
+        this->highlight_end_time_ = this->time_duration_ + 0.5f;
     }
 }
 
@@ -87,15 +88,14 @@ std::vector<std::vector<uint8_t>> Game::GetBoard() {
 }
 
 void Game::UpdateGameLines() {
-    this->highlight_end_time_ = this->time_duration_ + 0.5f;
-//    if (this->time_duration_ >= this->highlight_end_time_) {
+    if (this->time_duration_ >= this->highlight_end_time_) {
         this->board_->ClearLines();
         this->board_->SetClearedLineCount(this->board_->GetClearedLineCount() +
                                                   this->board_->GetClearedLineCount());
         this->points_ += this->ComputePoints();
         this->LevelUp();
         this->SetNextGamePhase(GameState::kGamePlayPhase);
-//    }
+    }
 }
 
 void Game::SetNextGamePhase(const GameState& game_phase) {
@@ -133,6 +133,14 @@ void Game::LevelUp() {
     if (this->board_->GetClearedLineCount() >= lines_for_next_level) {
         ++this->level_;
     }
+}
+
+GameState Game::GetActualGamePhase() const {
+    return this->game_phase_;
+}
+
+bool Game::IsLineClearing(int index) const {
+    return this->board_->IsLineClearing(index);
 }
 
 }
