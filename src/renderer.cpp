@@ -5,16 +5,12 @@
 namespace game {
 
 Renderer::Renderer() : kScreenHeight_(720), kScreenWidth_(440) {
-    auto bgr_color = ColorScheme(ColorSchemes::kBlack);
-    this->kBackgroundColor_ = {bgr_color.GetRValue(), bgr_color.GetGValue(),
-                               bgr_color.GetBValue(), bgr_color.GetAValue()};
+    this->kBackgroundColor_ = BLACK;
 }
 
 Renderer::Renderer(size_t width, size_t height)
         : kScreenHeight_(height), kScreenWidth_(width) {
-    auto bgr_color = ColorScheme(ColorSchemes::kBlack);
-    this->kBackgroundColor_ = {bgr_color.GetRValue(), bgr_color.GetGValue(),
-                               bgr_color.GetBValue(), bgr_color.GetAValue()};
+    this->kBackgroundColor_ = BLACK;
 }
 
 void Renderer::InitRenderer() {
@@ -31,19 +27,22 @@ void Renderer::GameLoop(Game* game) {
     while (!WindowShouldClose()) {
         auto input = this->GetMoveType();
         this->game_->UpdateGame(input);
-        RenderGame();
+        this->RenderGame();
     }
 }
 
-void Renderer::RenderGame() {
+void Renderer::RenderGame() const{
     BeginDrawing();
     ClearBackground(this->kBackgroundColor_);
     this->DrawBoard();
     this->DrawPiece();
+    if (this->game_->GetActualGamePhase() == GameState::kGameLinePhase) {
+        this->DrawLineClearingHighlight();
+    }
     EndDrawing();
 }
 
-void Renderer::DrawPiece() {
+void Renderer::DrawPiece() const{
     auto piece_size = this->game_->GetPieceSize();
     auto piece_shape = this->game_->GetPiece();
     for (int i = 0; i < piece_size; ++i) {
@@ -92,12 +91,28 @@ MoveTypes Renderer::GetMoveType() const {
     return MoveTypes::kNone;
 }
 
-void Renderer::DrawBoard() {
+void Renderer::DrawBoard() const{
     auto board = this->game_->GetBoard();
     for (int i = 0; i < this->game_->GetBoardHeight(); ++i) {
         for (int j = 0; j < this->game_->GetBoardWidth(); ++j) {
             uint8_t value = board.at(i).at(j);
             this->DrawCell(i, j, value, 0, 0);
+        }
+    }
+    DrawBoardOutline();
+}
+
+void Renderer::DrawBoardOutline() const {
+    int width = this->game_->GetBoardWidth() * this->kGridSize_;
+    int height = this->game_->GetBoardHeight() * this->kGridSize_;
+    DrawRectangleLines(0, 0, width, height, WHITE);
+}
+
+void Renderer::DrawLineClearingHighlight() const {
+    for (int i = 0; i < this->game_->GetBoardHeight(); ++i) {
+        if (this->game_->IsLineClearing(i)) {
+            DrawRectangle(0, i * this->kGridSize_, this->kGridSize_ * this->game_->GetBoardWidth(),
+                          this->kGridSize_, WHITE);
         }
     }
 }

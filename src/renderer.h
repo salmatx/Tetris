@@ -23,10 +23,12 @@ private:
     Color kBackgroundColor_;
     Game* game_;
 
-    void RenderGame();
-    void DrawPiece();
-    void DrawBoard();
+    void RenderGame() const;
+    void DrawPiece() const;
+    void DrawBoard() const;
     void DrawCell(int row, int col, int value, int offset_row, int offset_col) const;
+    void DrawBoardOutline() const;
+    void DrawLineClearingHighlight() const;
 };
 
 }
