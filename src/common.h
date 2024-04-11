@@ -14,4 +14,8 @@ enum class GameState {
     kGameStartPhase, kGamePlayPhase, kGameLinePhase, kGameOverPhase
 };
 
+enum class TextAlignment {
+    kRight, kCenter, kLeft
+};
+
 }
