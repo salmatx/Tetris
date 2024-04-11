@@ -2,11 +2,6 @@
 
 namespace game {
 
-Game::Game() : board_(std::make_unique<Board>()) {
-    Piece::MakeAllRotations();
-    this->start_time_ = std::chrono::steady_clock::now();
-}
-
 void Game::SetBoardSize(const size_t width, const size_t height) {
     this->board_ = std::make_unique<Board>(width, height);
 }
@@ -20,6 +15,10 @@ void Game::UpdateGameplay(const MoveTypes& input) {
     if (this->board_->GetPendingLineCount() > 0) {
         this->SetNextGamePhase(GameState::kGameLinePhase);
         this->highlight_end_time_ = this->time_duration_ + 0.5f;
+    }
+    int game_over_row = 0;
+    if (!this->board_->CheckRowEmpty(game_over_row)) {
+        this->SetNextGamePhase(GameState::kGameOverPhase);
     }
 }
 
@@ -43,6 +42,7 @@ void Game::UpdateGame(const MoveTypes& input) {
                     (this->current_time_ -this->start_time_).count();
     switch (this->game_phase_) {
         case GameState::kGameStartPhase:
+            this->UpdateGameStart(input);
             break;
         case GameState::kGamePlayPhase:
             this->UpdateGameplay(input);
@@ -51,6 +51,7 @@ void Game::UpdateGame(const MoveTypes& input) {
             this->UpdateGameLines();
             break;
         case GameState::kGameOverPhase:
+            this->UpdateGameOver(input);
             break;
     }
 }
@@ -141,6 +142,32 @@ GameState Game::GetActualGamePhase() const {
 
 bool Game::IsLineClearing(int index) const {
     return this->board_->IsLineClearing(index);
+}
+
+void Game::UpdateGameOver(const MoveTypes& input) {
+    if (input == MoveTypes::kSpace) {
+        this->SetNextGamePhase(GameState::kGameStartPhase);
+    }
+}
+
+void Game::UpdateGameStart(const MoveTypes& input, const size_t board_width, const size_t board_height) {
+    if (input == MoveTypes::kUp) {
+        ++this->start_level_;
+    }
+    if (input == MoveTypes::kDown && this->start_level_ > 0) {
+        --this->start_level_;
+    }
+    if (input == MoveTypes::kSpace) {
+        this->level_ = this->start_level_;
+        this->points_ = 0;
+        this->start_time_ = std::chrono::steady_clock::now();
+        this->SetBoardSize(board_width, board_height);
+        this->SetNextGamePhase(GameState::kGamePlayPhase);
+    }
+}
+
+Game::Game() {
+    Piece::MakeAllRotations();
 }
 
 }

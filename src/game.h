@@ -33,10 +33,10 @@ private:
     const float kTargetSecondsPerFrame = 1.0f / 60.0f;
 
     std::unique_ptr<Board> board_;
-    size_t points_ = 0;
-    size_t level_ = 0;
+    size_t points_;
+    size_t level_;
     size_t start_level_;
-    GameState game_phase_ = GameState::kGamePlayPhase;
+    GameState game_phase_ = GameState::kGameStartPhase;
     float next_drop_time_;
     float time_duration_;
     float highlight_end_time_;
@@ -44,7 +44,8 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> current_time_;
 
     void UpdateGameplay(const MoveTypes& input);
-    void UpdateGameStart(const MoveTypes& input);
+    void UpdateGameStart(const MoveTypes&, const size_t board_width = 10, const size_t board_height = 22);
+    void UpdateGameOver(const MoveTypes& input);
     void UpdateGameLines();
     float GetTimeToNextDrop();
     void DropPiece();
