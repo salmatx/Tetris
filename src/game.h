@@ -23,6 +23,7 @@ public:
     std::vector<std::vector<uint8_t>> GetBoard();
     bool IsLineClearing(int index) const;
     GameState GetActualGamePhase() const;
+    size_t GetStartLevel() const;
 
 private:
     const uint8_t kFramesPerDrop[30]{

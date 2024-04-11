@@ -30,6 +30,7 @@ float Game::GetTimeToNextDrop() {
 }
 
 void Game::DropPiece() {
+    this->next_drop_time_ = 0;
     if (this->board_->SoftDrop()) {
         this->next_drop_time_ = this->time_duration_ + this->GetTimeToNextDrop();
     }
@@ -162,12 +163,16 @@ void Game::UpdateGameStart(const MoveTypes& input, const size_t board_width, con
         this->points_ = 0;
         this->start_time_ = std::chrono::steady_clock::now();
         this->SetBoardSize(board_width, board_height);
-        this->SetNextGamePhase(GameState::kGamePlayPhase);
+         this->SetNextGamePhase(GameState::kGamePlayPhase);
     }
 }
 
 Game::Game() {
     Piece::MakeAllRotations();
+}
+
+size_t Game::GetStartLevel() const {
+    return this->start_level_;
 }
 
 }
