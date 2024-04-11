@@ -22,6 +22,7 @@ private:
     const char* kTitle_ = "Tetris";
     Color kBackgroundColor_;
     Game* game_;
+    Font font_;
 
     void RenderGame() const;
     void DrawPiece() const;
@@ -29,6 +30,7 @@ private:
     void DrawCell(int row, int col, int value, int offset_row, int offset_col) const;
     void DrawBoardOutline() const;
     void DrawLineClearingHighlight() const;
+    void DrawString(Font font, float font_size, const char* msg, size_t x, size_t y, TextAlignment alignment, Color color) const;
 };
 
 }

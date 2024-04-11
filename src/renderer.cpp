@@ -15,10 +15,12 @@ Renderer::Renderer(size_t width, size_t height)
 
 void Renderer::InitRenderer() {
     InitWindow(this->kScreenWidth_, this->kScreenHeight_, this->kTitle_);
+    this->font_ = LoadFont("../src/fonts/novem___.ttf");
     SetTargetFPS(60);
 }
 
 Renderer::~Renderer() {
+    UnloadFont(this->font_);
     CloseWindow();
 }
 
@@ -34,10 +36,20 @@ void Renderer::GameLoop(Game* game) {
 void Renderer::RenderGame() const{
     BeginDrawing();
     ClearBackground(this->kBackgroundColor_);
-    this->DrawBoard();
-    this->DrawPiece();
+    if (this->game_->GetActualGamePhase() == GameState::kGameStartPhase) {
+
+    }
+    if (this->game_->GetActualGamePhase() == GameState::kGamePlayPhase) {
+        this->DrawBoard();
+        this->DrawPiece();
+    }
     if (this->game_->GetActualGamePhase() == GameState::kGameLinePhase) {
         this->DrawLineClearingHighlight();
+    }
+    if (this->game_->GetActualGamePhase() == GameState::kGameOverPhase) {
+        size_t x = this->game_->GetBoardWidth() * this->kGridSize_ / 2;
+        size_t y = this->game_->GetBoardHeight() * this->kGridSize_ / 2;
+        this->DrawString(this->font_, this->font_.baseSize * 1.5, "GAME OVER", x, y, TextAlignment::kCenter, WHITE);
     }
     EndDrawing();
 }
@@ -115,6 +127,25 @@ void Renderer::DrawLineClearingHighlight() const {
                           this->kGridSize_, WHITE);
         }
     }
+}
+
+void Renderer::DrawString(Font font, float font_size, const char* msg, size_t x, size_t y, TextAlignment alignment, Color color) const {
+    const int spacing = -3;
+    float x_pos;
+    float y_pos = (float)y;
+    switch (alignment) {
+        case TextAlignment::kRight:
+            x_pos = (float)x - MeasureTextEx(font,msg, font_size, -3).x;
+            break;
+        case TextAlignment::kCenter:
+            x_pos = (float)x - MeasureTextEx(font,msg, font_size, -3).x / 2;
+            break;
+        case TextAlignment::kLeft:
+            x_pos = (float)x;
+            break;
+    }
+    Vector2 position = {x_pos, y_pos};
+    DrawTextEx(font, msg, position, font_size, -3, color);
 }
 
 }
