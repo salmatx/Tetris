@@ -57,20 +57,20 @@ void Game::UpdateGame(const MoveTypes& input) {
     }
 }
 
-uint16_t Game::GetPieceSize() {
-    return this->board_->GetPieceSize();
+uint16_t Game::GetPieceSize(PieceType type) {
+    return this->board_->GetPieceSize(type);
 }
 
-uint8_t* Game::GetPiece() {
-    return this->board_->GetPiece();
+uint8_t* Game::GetPiece(PieceType type) {
+    return this->board_->GetPiece(type);
 }
 
-int Game::GetPieceRowPosition() {
-    return this->board_->GetRowPosition();
+int Game::GetPieceRowPosition(PieceType type) {
+    return this->board_->GetRowPosition(type);
 }
 
-int Game::GetPieceColumnPosition() {
-    return this->board_->GetColumnPosition();
+int Game::GetPieceColumnPosition(PieceType type) {
+    return this->board_->GetColumnPosition(type);
 }
 
 Game::~Game() {
@@ -93,7 +93,7 @@ void Game::UpdateGameLines() {
     if (this->time_duration_ >= this->highlight_end_time_) {
         this->board_->ClearLines();
         this->board_->SetClearedLineCount(this->board_->GetClearedLineCount() +
-                                                  this->board_->GetClearedLineCount());
+                                                  this->board_->GetPendingLineCount());
         this->points_ += this->ComputePoints();
         this->LevelUp();
         this->SetNextGamePhase(GameState::kGamePlayPhase);
@@ -105,7 +105,7 @@ void Game::SetNextGamePhase(const GameState& game_phase) {
 }
 
 size_t Game::ComputePoints() {
-    switch (this->board_->GetClearedLineCount()) {
+    switch (this->board_->GetPendingLineCount()) {
         case 1:
             return 40 * (this->level_ + 1);
         case 2:
@@ -119,20 +119,20 @@ size_t Game::ComputePoints() {
     }
 }
 
-size_t Game::GetLinesForNextLevel() {
-    const size_t max_condition = this->start_level_ * 10 - 50;
-    const size_t min_condition = this->start_level_ * 10 - 10;
-    size_t max = 100 > max_condition ? 100 : max_condition;
-    size_t first_level_up_limit = min_condition > max ? min_condition : max;
+int Game::GetLinesForNextLevel() {
+    const int max_condition = this->start_level_ * 10 - 50;
+    const int min_condition = this->start_level_ * 10 - 10;
+    int max = 100 > max_condition ? 100 : max_condition;
+    int first_level_up_limit = min_condition < max ? min_condition : max;
     if (this->level_ == this->start_level_) {
         return first_level_up_limit;
     }
-    return first_level_up_limit + (this->level_ - this->start_level_) * 10;
+    return first_level_up_limit + (int)(this->level_ - this->start_level_) * 10;
 }
 
 void Game::LevelUp() {
-    size_t lines_for_next_level = this->GetLinesForNextLevel();
-    if (this->board_->GetClearedLineCount() >= lines_for_next_level) {
+    int lines_for_next_level = this->GetLinesForNextLevel();
+    if ((int)this->board_->GetClearedLineCount() >= lines_for_next_level) {
         ++this->level_;
     }
 }
@@ -173,6 +173,22 @@ Game::Game() {
 
 size_t Game::GetStartLevel() const {
     return this->start_level_;
+}
+
+size_t Game::GetLevel() const {
+    return this->level_;
+}
+
+size_t Game::GetClearedLineCount() const {
+    return this->board_->GetClearedLineCount();
+}
+
+size_t Game::GetPoints() const {
+    return this->points_;
+}
+
+int Game::GetShadowPieceRowPosition() {
+    return this->board_->GetShadowPieceRowPosition();
 }
 
 }

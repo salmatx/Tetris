@@ -14,7 +14,7 @@ Board::Board(size_t width, size_t height) :
         board_(height, std::vector<uint8_t>(width)) {
     rand_gen.seed(time(nullptr));
     this->lines_to_clear_.reserve(this->height_);
-    this->MakePiece(this->SelectRandomPiece(), 0, this->width_ / 2);
+    this->MakePiece(0, this->width_ / 2 - 1);
 }
 
 void Board::SetValue(const int& row, const int& col, const uint8_t value) {
@@ -46,8 +46,14 @@ bool Board::CheckPieceValid(const Board::PieceState& piece) {
     return true;
 }
 
-void Board::MakePiece(Shape shape, int offset_row, int offset_col) {
-    this->actual_piece_ = std::make_unique<PieceState>(PieceState{Piece{shape}, offset_row, offset_col});
+void Board::MakePiece(int offset_row, int offset_col) {
+    if (this->next_piece_ == nullptr) {
+        auto shape = this->SelectRandomPiece();
+        this->next_piece_ = std::make_unique<PieceState>(PieceState{Piece{shape}, offset_row, offset_col});
+    }
+    this->actual_piece_ = std::move(this->next_piece_);
+    auto next_shape = this->SelectRandomPiece();
+    this->next_piece_ = std::make_unique<PieceState>(PieceState{Piece{next_shape}, offset_row, offset_col});
 }
 
 void Board::MovePieceLeft() {
@@ -100,7 +106,7 @@ bool Board::SoftDrop() {
     if (!this->CheckPieceValid(*this->actual_piece_)) {
         --this->actual_piece_->offset_row;
         this->MergePieceIntoBoard();
-        this->MakePiece(this->SelectRandomPiece(), 0, this->width_ / 2);
+        this->MakePiece(0, this->width_ / 2 - 1);
         return false;
     }
     return true;
@@ -126,20 +132,44 @@ Shape Board::SelectRandomPiece() {
     return static_cast<game::Shape>(number);
 }
 
-uint8_t* Board::GetPiece() {
-    return this->actual_piece_->piece.GetPiece();
+uint8_t* Board::GetPiece(PieceType type) {
+    switch (type) {
+        case PieceType::kActualPiece:
+            return this->actual_piece_->piece.GetPiece();
+        case PieceType::kNextPiece:
+            return this->next_piece_->piece.GetPiece();
+    }
+    return nullptr;
 }
 
-int Board::GetRowPosition() {
-    return this->actual_piece_->offset_row;
+int Board::GetRowPosition(PieceType type) {
+    switch (type) {
+        case PieceType::kActualPiece:
+            return this->actual_piece_->offset_row;
+        case PieceType::kNextPiece:
+            return this->next_piece_->offset_row;
+    }
+    return 0;
 }
 
-int Board::GetColumnPosition() {
-    return this->actual_piece_->offset_col;
+int Board::GetColumnPosition(PieceType type) {
+    switch (type) {
+        case PieceType::kActualPiece:
+            return this->actual_piece_->offset_col;
+        case PieceType::kNextPiece:
+            return this->next_piece_->offset_col;
+    }
+    return 0;
 }
 
-uint16_t Board::GetPieceSize() {
-    return this->actual_piece_->piece.GetDim();
+uint16_t Board::GetPieceSize(PieceType type) {
+    switch (type) {
+        case PieceType::kActualPiece:
+            return this->actual_piece_->piece.GetDim();
+        case PieceType::kNextPiece:
+            return this->next_piece_->piece.GetDim();
+    }
+    return 0;
 }
 
 size_t Board::GetBoardHeight() {
@@ -209,7 +239,7 @@ void Board::SetClearedLineCount(uint8_t value) {
     this->cleared_line_count_ = value;
 }
 
-size_t Board::GetClearedLineCount() {
+size_t Board::GetClearedLineCount() const {
     return this->cleared_line_count_;
 }
 
@@ -224,6 +254,15 @@ bool Board::CheckRowEmpty(const int& row) const {
         }
     }
     return true;
+}
+
+int Board::GetShadowPieceRowPosition(){
+    auto shadow_piece = *this->actual_piece_;
+    while (this->CheckPieceValid(shadow_piece)) {
+        ++shadow_piece.offset_row;
+    }
+    --shadow_piece.offset_row;
+    return shadow_piece.offset_row;
 }
 
 

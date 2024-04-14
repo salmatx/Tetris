@@ -18,4 +18,8 @@ enum class TextAlignment {
     kRight, kCenter, kLeft
 };
 
+enum class PieceType {
+    kActualPiece, kNextPiece
+};
+
 }

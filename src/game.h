@@ -14,16 +14,20 @@ public:
     ~Game();
     void UpdateGame(const MoveTypes& input);
     void SetBoardSize(const size_t width, const size_t height);
-    uint16_t GetPieceSize();
-    uint8_t* GetPiece();
-    int GetPieceRowPosition();
-    int GetPieceColumnPosition();
+    uint16_t GetPieceSize(PieceType type);
+    uint8_t* GetPiece(PieceType type);
+    int GetPieceRowPosition(PieceType type);
+    int GetPieceColumnPosition(PieceType type);
     size_t GetBoardHeight();
     size_t GetBoardWidth();
     std::vector<std::vector<uint8_t>> GetBoard();
     bool IsLineClearing(int index) const;
     GameState GetActualGamePhase() const;
     size_t GetStartLevel() const;
+    size_t GetLevel() const;
+    size_t GetClearedLineCount() const;
+    size_t GetPoints() const;
+    int GetShadowPieceRowPosition();
 
 private:
     const uint8_t kFramesPerDrop[30]{
@@ -52,7 +56,7 @@ private:
     void DropPiece();
     void SetNextGamePhase(const GameState& game_phase);
     size_t ComputePoints();
-    size_t GetLinesForNextLevel();
+    int GetLinesForNextLevel();
     void LevelUp();
 };
 

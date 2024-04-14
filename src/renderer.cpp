@@ -40,38 +40,42 @@ void Renderer::RenderGame() const{
         this->DrawStartScreen();
     }
     if (this->game_->GetActualGamePhase() == GameState::kGamePlayPhase) {
+        this->DrawPiece(0, this->kMarginY_, PieceType::kActualPiece);
+        this->DrawStartOverlap();
         this->DrawBoard();
-        this->DrawPiece();
+        this->DrawShadowPiece(0, this->kMarginY_);
+        this->DrawGameInfo();
     }
     if (this->game_->GetActualGamePhase() == GameState::kGameLinePhase) {
         this->DrawBoard();
         this->DrawLineClearingHighlight();
+        this->DrawGameInfo();
     }
     if (this->game_->GetActualGamePhase() == GameState::kGameOverPhase) {
         this->DrawBoard();
         size_t x = this->game_->GetBoardWidth() * this->kGridSize_ / 2;
-        size_t y = this->game_->GetBoardHeight() * this->kGridSize_ / 2;
+        size_t y = (this->game_->GetBoardHeight() * this->kGridSize_ + this->kMarginY_) / 2;
         this->DrawString(this->font_, this->font_.baseSize * 1.5, "GAME OVER", x, y, TextAlignment::kCenter, WHITE);
     }
     EndDrawing();
 }
 
-void Renderer::DrawPiece() const{
-    auto piece_size = this->game_->GetPieceSize();
-    auto piece_shape = this->game_->GetPiece();
+void Renderer::DrawPiece(int offset_x, int offset_y, PieceType type) const{
+    auto piece_size = this->game_->GetPieceSize(type);
+    auto piece_shape = this->game_->GetPiece(type);
     for (int i = 0; i < piece_size; ++i) {
         for (int j = 0; j < piece_size; ++j) {
             uint8_t value = *piece_shape++;
             if (value) {
-                int row = this->game_->GetPieceRowPosition() + i;
-                int col = this->game_->GetPieceColumnPosition() + j;
-                DrawCell(row, col, value, 0, 0);
+                int row = this->game_->GetPieceRowPosition(type) + i;
+                int col = this->game_->GetPieceColumnPosition(type) + j;
+                DrawCell(row, col, value, offset_y, offset_x, false);
             }
         }
     }
 }
 
-void Renderer::DrawCell(int row, int col, int value, int offset_row, int offset_col) const {
+void Renderer::DrawCell(int row, int col, int value, int offset_row, int offset_col, bool outline) const {
     auto base_color_scheme = ColorScheme(ColorSchemes::kBaseColors, value);
     auto light_color_scheme = ColorScheme(ColorSchemes::kLightColors, value);
     auto dark_color_scheme = ColorScheme(ColorSchemes::kDarkColors, value);
@@ -86,6 +90,11 @@ void Renderer::DrawCell(int row, int col, int value, int offset_row, int offset_
     int edge = this->kGridSize_ / 8;
     int x = col * this->kGridSize_ + offset_col;
     int y = row * this->kGridSize_ + offset_row;
+
+    if (outline) {
+        DrawRectangleLines(x, y, this->kGridSize_, this->kGridSize_, base_color);
+        return;
+    }
 
     if (value) {
         DrawRectangle(x, y, this->kGridSize_, this->kGridSize_, dark_color);
@@ -115,10 +124,12 @@ MoveTypes Renderer::GetMoveType() const {
 
 void Renderer::DrawBoard() const{
     auto board = this->game_->GetBoard();
-    for (int i = 0; i < this->game_->GetBoardHeight(); ++i) {
-        for (int j = 0; j < this->game_->GetBoardWidth(); ++j) {
+    int board_height = this->game_->GetBoardHeight();
+    int board_width = this->game_->GetBoardWidth();
+    for (int i = 0; i < board_height; ++i) {
+        for (int j = 0; j < board_width; ++j) {
             uint8_t value = board.at(i).at(j);
-            this->DrawCell(i, j, value, 0, 0);
+            this->DrawCell(i, j, value, this->kMarginY_, 0, false);
         }
     }
     DrawBoardOutline();
@@ -127,13 +138,13 @@ void Renderer::DrawBoard() const{
 void Renderer::DrawBoardOutline() const {
     int width = this->game_->GetBoardWidth() * this->kGridSize_;
     int height = this->game_->GetBoardHeight() * this->kGridSize_;
-    DrawRectangleLines(0, 0, width, height, WHITE);
+    DrawRectangleLines(0, this->kMarginY_, width, height, WHITE);
 }
 
 void Renderer::DrawLineClearingHighlight() const {
     for (int i = 0; i < this->game_->GetBoardHeight(); ++i) {
         if (this->game_->IsLineClearing(i)) {
-            DrawRectangle(0, i * this->kGridSize_, this->kGridSize_ * this->game_->GetBoardWidth(),
+            DrawRectangle(0, i * this->kGridSize_ + this->kMarginY_, this->kGridSize_ * this->game_->GetBoardWidth(),
                           this->kGridSize_, WHITE);
         }
     }
@@ -185,6 +196,47 @@ void Renderer::DrawStartScreen() const {
     y += spacing;
     this->DrawString(this->font_, this->font_.baseSize, "HARD DROP:", x, y, TextAlignment::kLeft, WHITE);
     this->DrawString(this->font_, this->font_.baseSize, "SPACE KEY", x + 120, y, TextAlignment::kLeft, WHITE);
+}
+
+void Renderer::DrawGameInfo() const {
+    char buffer[2048];
+    std::sprintf(buffer, "LEVEL: %ld", this->game_->GetLevel());
+    float x = 0;
+    float y = 0;
+    float spacing = 30;
+    this->DrawString(this->font_, this->font_.baseSize, buffer, x, y, TextAlignment::kLeft, WHITE);
+    std::sprintf(buffer, "CLEARED LINES: %ld", this->game_->GetClearedLineCount());
+    this->DrawString(this->font_, this->font_.baseSize, buffer, x + 120, y, TextAlignment::kLeft, WHITE);
+    std::sprintf(buffer, "POINTS: %ld", this->game_->GetPoints());
+    this->DrawString(this->font_, this->font_.baseSize, buffer, x, y + spacing, TextAlignment::kLeft, WHITE);
+
+    x = 330;
+    y = 60;
+    this->DrawString(this->font_, this->font_.baseSize, "NEXT PIECE", x, y, TextAlignment::kLeft, WHITE);
+    DrawRectangleLines(x - 20, y, 120, y + 90, WHITE);
+    x = 250 - (this->game_->GetPieceSize(PieceType::kNextPiece) * this->kGridSize_) / 2;
+    y = 100;
+    this->DrawPiece(x, y, PieceType::kNextPiece);
+}
+
+void Renderer::DrawStartOverlap() const {
+    DrawRectangle(0, this->kMarginY_, this->game_->GetBoardWidth() * this->kGridSize_,
+                  2 * this->kGridSize_, this->kBackgroundColor_);
+}
+
+void Renderer::DrawShadowPiece(int offset_x, int offset_y) const {
+    auto piece_size = this->game_->GetPieceSize(PieceType::kActualPiece);
+    auto piece_shape = this->game_->GetPiece(PieceType::kActualPiece);
+    for (int i = 0; i < piece_size; ++i) {
+        for (int j = 0; j < piece_size; ++j) {
+            uint8_t value = *piece_shape++;
+            if (value) {
+                int row = this->game_->GetShadowPieceRowPosition() + i;
+                int col = this->game_->GetPieceColumnPosition(PieceType::kActualPiece) + j;
+                DrawCell(row, col, value, offset_y, offset_x, true);
+            }
+        }
+    }
 }
 
 }
