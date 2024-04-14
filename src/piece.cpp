@@ -19,51 +19,8 @@ Piece::Piece(Shape shape) {
         this->dim_ = Piece::kAllRotations.at(shape).at(0)->dim_;
     }
     else {
-        switch (shape) {
-            case Shape::kSquare:
-                this->shape_ = (tetrino*) Tetrinos::square;
-                this->dim_ = static_cast<uint16_t>(sqrt(
-                        sizeof(Tetrinos::square) / sizeof(*Tetrinos::square)));
-                break;
-            case Shape::kBar:
-                this->shape_ = (tetrino*) Tetrinos::bar;
-                this->dim_ = static_cast<uint16_t>(sqrt(
-                        sizeof(Tetrinos::bar) / sizeof(*Tetrinos::bar)));
-                break;
-            case Shape::kSShape:
-                this->shape_ = (tetrino*) Tetrinos::s_shape;
-                this->dim_ = static_cast<uint16_t>(sqrt(
-                        sizeof(Tetrinos::s_shape) /
-                        sizeof(*Tetrinos::s_shape)));
-                break;
-            case Shape::kZShape:
-                this->shape_ = (tetrino*) Tetrinos::z_shape;
-                this->dim_ = static_cast<uint16_t>(sqrt(
-                        sizeof(Tetrinos::z_shape) /
-                        sizeof(*Tetrinos::z_shape)));
-                break;
-            case Shape::kPyramid:
-                this->shape_ = (tetrino*) Tetrinos::pyramid;
-                this->dim_ = static_cast<uint16_t>(sqrt(
-                        sizeof(Tetrinos::pyramid) /
-                        sizeof(*Tetrinos::pyramid)));
-                break;
-            case Shape::kLShape:
-                this->shape_ = (tetrino*) Tetrinos::l_shape;
-                this->dim_ = static_cast<uint16_t>(sqrt(
-                        sizeof(Tetrinos::l_shape) /
-                        sizeof(*Tetrinos::l_shape)));
-                break;
-            case Shape::kJShape:
-                this->shape_ = (tetrino*) Tetrinos::j_shape;
-                this->dim_ = static_cast<uint16_t>(sqrt(
-                        sizeof(Tetrinos::j_shape) /
-                        sizeof(*Tetrinos::j_shape)));
-                break;
-            default:
-                this->shape_ = nullptr;
-                break;
-        }
+        this->shape_ = Tetrino::Get(shape)->shape;
+        this->dim_ = Tetrino::Get(shape)->dim;
     }
 }
 
@@ -114,21 +71,7 @@ Piece::Piece(const Piece& other) {
     this->next_ = other.next_;
 }
 
-Piece::Piece(Piece&& other) noexcept {
-    this->dim_ = std::exchange(other.dim_, 0);
-    this->shape_ = std::exchange(other.shape_, nullptr);
-    this->next_ = std::exchange(other.next_, nullptr);
-}
-
 Piece& Piece::operator=(const Piece& other) {
-    Piece tmp{other};
-    std::swap(this->dim_, tmp.dim_);
-    std::swap(this->shape_, tmp.shape_);
-    std::swap(this->next_, tmp.next_);
-    return *this;
-}
-
-Piece& Piece::operator=(Piece&& other) noexcept {
     Piece tmp{other};
     std::swap(this->dim_, tmp.dim_);
     std::swap(this->shape_, tmp.shape_);
@@ -154,10 +97,6 @@ Piece* Piece::FastRotation() const {
 
 tetrino* Piece::GetPiece() const {
     return this->shape_;
-}
-
-uint16_t Piece::GetSize() const {
-    return this->dim_ * this->dim_;
 }
 
 }

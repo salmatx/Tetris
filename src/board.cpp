@@ -451,5 +451,4 @@ Board& Board::operator=(const Board& other) {
     return *this;
 }
 
-
 }
