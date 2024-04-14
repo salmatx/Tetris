@@ -2,17 +2,16 @@
 
 #include <cstddef>
 #include <raylib.h>
-#include "game.h"
+#include "board.h"
 
 namespace game {
 
 class Renderer {
 public:
     Renderer();
-    Renderer(size_t width, size_t height);
     ~Renderer();
     void InitRenderer();
-    void GameLoop(Game* game);
+    void GameLoop();
     MoveTypes GetMoveType() const;
 
 private:
@@ -22,7 +21,7 @@ private:
     const int kMarginY_ = 60;
     const char* kTitle_ = "Tetris";
     Color kBackgroundColor_;
-    Game* game_;
+    std::unique_ptr<Board> board_;
     Font font_;
 
     void RenderGame() const;

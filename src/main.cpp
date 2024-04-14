@@ -1,5 +1,5 @@
 #include "renderer.h"
-#include "game.h"
+#include "board.h"
 
 #include <iostream>
 
@@ -8,10 +8,9 @@
 using namespace game;
 
 int main() {
-    Game game{};
     Renderer renderer{};
     renderer.InitRenderer();
-    renderer.GameLoop(&game);
+    renderer.GameLoop();
 
     return 0;
 }
