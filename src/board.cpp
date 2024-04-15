@@ -6,12 +6,12 @@ namespace game {
 
 using RandGenType = std::mt19937;
 
-RandGenType rand_gen;
-std::uniform_int_distribution<uint32_t> uniform_dist(0, static_cast<int>(game::Shape::kNumOfShapes) - 1);
+std::random_device rd;
+RandGenType rand_gen(rd());
+std::uniform_int_distribution<uint8_t> uniform_dist(0, static_cast<int>(game::Shape::kNumOfShapes) - 1);
 
 Board::Board() :
         board_(this->height_, std::vector<uint8_t>(this->width_)) {
-    rand_gen.seed(time(nullptr));
     this->lines_to_clear_.reserve(this->height_);
     this->MakePiece(0, this->width_ / 2 - 1);
 }
@@ -127,7 +127,7 @@ void Board::MergePieceIntoBoard() {
 }
 
 Shape Board::SelectRandomPiece() {
-    int number = uniform_dist( rand_gen);
+    uint8_t number = uniform_dist( rand_gen);
     return static_cast<game::Shape>(number);
 }
 
