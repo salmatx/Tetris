@@ -4,10 +4,10 @@
 
 namespace game {
 
-using RandGenType = std::mt19937;
+using RandGenType = std::mt19937_64;
 
-std::random_device rd;
-RandGenType rand_gen(rd());
+std::random_device rd{};
+RandGenType rand_gen{rd()};
 std::uniform_int_distribution<uint8_t> uniform_dist(0, static_cast<int>(game::Shape::kNumOfShapes) - 1);
 
 Board::Board() :
