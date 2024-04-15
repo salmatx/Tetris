@@ -16,15 +16,15 @@ Board::Board() :
     this->MakePiece(0, this->width_ / 2 - 1);
 }
 
-void Board::SetValue(const int& row, const int& col, const uint8_t value) {
+void Board::SetValue(const int row, const int col, const uint8_t value) {
     this->board_.at(row).at(col) = value;
 }
 
-uint8_t Board::GetValue(const int& row, const int& col) const{
+uint8_t Board::GetValue(const int row, const int col) const{
     return this->board_.at(row).at(col);
 }
 
-bool Board::CheckPieceValid(const Board::PieceState& piece) {
+bool Board::CheckPieceValid(const Board::PieceState piece) const {
     assert(&piece.piece);
     tetrino* shape = piece.piece.GetPiece();
     uint16_t size = piece.piece.GetDim();
@@ -79,7 +79,7 @@ void Board::RotatePiece() {
     }
 }
 
-void Board::MovePiece(const MoveTypes& move) {
+void Board::MovePiece(const MoveTypes move) {
     switch (move) {
         case MoveTypes::kLeft:
             this->MovePieceLeft();
@@ -131,7 +131,7 @@ Shape Board::SelectRandomPiece() {
     return static_cast<game::Shape>(number);
 }
 
-uint8_t* Board::GetPiece(PieceType type) {
+uint8_t* Board::GetPiece(const PieceType type) const {
     switch (type) {
         case PieceType::kActualPiece:
             return this->actual_piece_->piece.GetPiece();
@@ -141,7 +141,7 @@ uint8_t* Board::GetPiece(PieceType type) {
     return nullptr;
 }
 
-int Board::GetPieceRowPosition(PieceType type) {
+int Board::GetPieceRowPosition(const PieceType type) const {
     switch (type) {
         case PieceType::kActualPiece:
             return this->actual_piece_->offset_row;
@@ -151,7 +151,7 @@ int Board::GetPieceRowPosition(PieceType type) {
     return 0;
 }
 
-int Board::GetPieceColumnPosition(PieceType type) {
+int Board::GetPieceColumnPosition(const PieceType type) const{
     switch (type) {
         case PieceType::kActualPiece:
             return this->actual_piece_->offset_col;
@@ -161,7 +161,7 @@ int Board::GetPieceColumnPosition(PieceType type) {
     return 0;
 }
 
-uint16_t Board::GetPieceSize(PieceType type) {
+uint16_t Board::GetPieceSize(const PieceType type) const{
     switch (type) {
         case PieceType::kActualPiece:
             return this->actual_piece_->piece.GetDim();
@@ -171,15 +171,15 @@ uint16_t Board::GetPieceSize(PieceType type) {
     return 0;
 }
 
-size_t Board::GetBoardHeight() {
+size_t Board::GetBoardHeight() const {
     return this->height_;
 }
 
-size_t Board::GetBoardWidth() {
+size_t Board::GetBoardWidth() const {
     return this->width_;
 }
 
-std::vector<std::vector<uint8_t>> Board::GetBoard() {
+std::vector<std::vector<uint8_t>> Board::GetBoard() const {
     return this->board_;
 }
 
@@ -230,7 +230,7 @@ void Board::SetPendingLineCount(uint8_t value) {
     this->pending_line_count_ = value;
 }
 
-uint8_t Board::GetPendingLineCount() {
+uint8_t Board::GetPendingLineCount() const {
     return this->pending_line_count_;
 }
 
@@ -246,7 +246,7 @@ bool Board::IsLineClearing(int index) const {
     return this->lines_to_clear_[index];
 }
 
-bool Board::CheckRowEmpty(const int& row) const {
+bool Board::CheckRowEmpty(int row) const {
     for (int i = 0; i < this->width_; ++i) {
         if (this->GetValue(row, i)) {
             return false;
@@ -264,7 +264,7 @@ int Board::GetShadowPieceRowPosition(){
     return shadow_piece.offset_row;
 }
 
-void Board::UpdateGame(const MoveTypes& input) {
+void Board::UpdateGame(MoveTypes input) {
     this->current_time_ = std::chrono::steady_clock::now();
     this->time_duration_ =
             std::chrono::duration_cast<std::chrono::duration<float>>
@@ -301,7 +301,7 @@ size_t Board::GetPoints() const {
     return this->points_;
 }
 
-void Board::UpdateGameplay(const MoveTypes& input) {
+void Board::UpdateGameplay(const MoveTypes input) {
     this->MovePiece(input);
     if (this->time_duration_ >= this->next_drop_time_) {
         this->DropPiece();
@@ -324,7 +324,7 @@ void Board::DropPiece() {
     }
 }
 
-void Board::UpdateGameStart(const MoveTypes& input, const size_t board_width,
+void Board::UpdateGameStart(const MoveTypes input, const size_t board_width,
                             const size_t board_height) {
     if (input == MoveTypes::kUp) {
         ++this->start_level_;
@@ -341,7 +341,7 @@ void Board::UpdateGameStart(const MoveTypes& input, const size_t board_width,
     }
 }
 
-void Board::UpdateGameOver(const MoveTypes& input) {
+void Board::UpdateGameOver(const MoveTypes input) {
     if (input == MoveTypes::kSpace) {
         this->SetNextGamePhase(GameState::kGameStartPhase);
     }
@@ -365,7 +365,7 @@ float Board::GetTimeToNextDrop() {
     return this->kFramesPerDrop[this->level_] * this->kTargetSecondsPerFrame;
 }
 
-void Board::SetNextGamePhase(const GameState& game_phase) {
+void Board::SetNextGamePhase(const GameState game_phase) {
     this->game_phase_ = game_phase;
 }
 
