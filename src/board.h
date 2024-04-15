@@ -15,23 +15,16 @@ public:
     Board();
     Board(const Board& other);
     Board& operator=(const Board& other);
-    void MovePiece(const MoveTypes move);
     uint8_t* GetPiece(const PieceType type) const;
     int GetShadowPieceRowPosition();
     int GetPieceRowPosition(const PieceType type) const;
     int GetPieceColumnPosition(const PieceType type) const;
     uint16_t GetPieceSize(const PieceType type) const;
-    size_t GetBoardHeight() const;
-    size_t GetBoardWidth() const;
+    uint8_t GetBoardHeight() const;
+    uint8_t GetBoardWidth() const;
     std::vector<std::vector<uint8_t>> GetBoard() const;
-    int FindLinesToClear();
-    void ClearLines();
-    void SetPendingLineCount(uint8_t value);
-    uint8_t GetPendingLineCount() const;
-    void SetClearedLineCount(uint8_t value);
     size_t GetClearedLineCount() const;
     bool IsLineClearing(int index) const;
-    bool CheckRowEmpty(int row) const;
     void UpdateGame(MoveTypes input);
     GameState GetActualGamePhase() const;
     size_t GetStartLevel() const;
@@ -50,8 +43,8 @@ private:
             2, 2, 2, 2, 2, 2, 2, 2, 2, 1
     };
     const float kTargetSecondsPerFrame = 1.0f / 60.0f;
-    const size_t height_ = 22;
-    const size_t width_ = 10;
+    const uint8_t height_ = 22;
+    const uint8_t width_ = 10;
     std::vector<bool> lines_to_clear_{};
     uint8_t pending_line_count_ = 0;
     size_t cleared_line_count_ = 0;
@@ -68,30 +61,33 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> start_time_{};
     std::chrono::time_point<std::chrono::steady_clock> current_time_{};
 
-    void SetValue(const int row, const int col, const uint8_t value);
-    uint8_t GetValue(const int row, const int col) const;
-    bool CheckPieceValid(const PieceState piece) const;
+    void UpdateGameplay(const MoveTypes input);
+    void UpdateGameStart(const MoveTypes);
+    void UpdateGameOver(const MoveTypes input);
+    void UpdateGameLines();
+    void MovePiece(const MoveTypes move);
     void MovePieceLeft();
     void MovePieceRight();
     void RotatePiece();
+    void HardDrop();
+    void SetNextDrop();
+    bool SoftDrop();
+    float GetTimeToNextDrop();
+    bool CheckRowFilled(const int& row) const;
+    bool CheckRowEmpty(int row) const;
+    int FindLinesToClear();
+    void ClearLines();
+    bool CheckPieceValid(const PieceState piece) const;
     void MergePieceIntoBoard();
     void MakePiece(int offset_row, int offset_col);
     Shape SelectRandomPiece();
-    void HardDrop();
-    bool CheckRowFilled(const int& row) const;
-    bool SoftDrop();
-    void DropPiece();
-    void UpdateGameplay(const MoveTypes input);
-    void UpdateGameStart(const MoveTypes, const size_t board_width = 10,
-                         const size_t board_height = 22);
-    void UpdateGameOver(const MoveTypes input);
-    void UpdateGameLines();
-    float GetTimeToNextDrop();
-    void SetNextGamePhase(const GameState game_phase);
-    size_t ComputePoints();
-    int GetLinesForNextLevel();
-    void LevelUp();
+    void SetValue(const int row, const int col, const uint8_t value);
+    uint8_t GetValue(const int row, const int col) const;
     void BoardClean();
+    void SetNextGamePhase(const GameState game_phase);
+    size_t ComputePoints() const;
+    size_t GetLinesForNextLevel() const;
+    void LevelUp();
 };
 
 }

@@ -171,11 +171,11 @@ uint16_t Board::GetPieceSize(const PieceType type) const{
     return 0;
 }
 
-size_t Board::GetBoardHeight() const {
+uint8_t Board::GetBoardHeight() const {
     return this->height_;
 }
 
-size_t Board::GetBoardWidth() const {
+uint8_t Board::GetBoardWidth() const {
     return this->width_;
 }
 
@@ -224,18 +224,6 @@ void Board::ClearLines() {
             --src_row;
         }
     }
-}
-
-void Board::SetPendingLineCount(uint8_t value) {
-    this->pending_line_count_ = value;
-}
-
-uint8_t Board::GetPendingLineCount() const {
-    return this->pending_line_count_;
-}
-
-void Board::SetClearedLineCount(uint8_t value) {
-    this->cleared_line_count_ = value;
 }
 
 size_t Board::GetClearedLineCount() const {
@@ -304,10 +292,10 @@ size_t Board::GetPoints() const {
 void Board::UpdateGameplay(const MoveTypes input) {
     this->MovePiece(input);
     if (this->time_duration_ >= this->next_drop_time_) {
-        this->DropPiece();
+        this->SetNextDrop();
     }
-    this->SetPendingLineCount(this->FindLinesToClear());
-    if (this->GetPendingLineCount() > 0) {
+    this->pending_line_count_ = FindLinesToClear();
+    if (this->pending_line_count_ > 0) {
         this->SetNextGamePhase(GameState::kGameLinePhase);
         this->highlight_end_time_ = this->time_duration_ + 0.5f;
     }
@@ -317,15 +305,14 @@ void Board::UpdateGameplay(const MoveTypes input) {
     }
 }
 
-void Board::DropPiece() {
+void Board::SetNextDrop() {
     this->next_drop_time_ = 0;
     if (this->SoftDrop()) {
         this->next_drop_time_ = this->time_duration_ + this->GetTimeToNextDrop();
     }
 }
 
-void Board::UpdateGameStart(const MoveTypes input, const size_t board_width,
-                            const size_t board_height) {
+void Board::UpdateGameStart(const MoveTypes input) {
     if (input == MoveTypes::kUp) {
         ++this->start_level_;
     }
@@ -350,8 +337,7 @@ void Board::UpdateGameOver(const MoveTypes input) {
 void Board::UpdateGameLines() {
     if (this->time_duration_ >= this->highlight_end_time_) {
         this->ClearLines();
-        this->SetClearedLineCount(this->GetClearedLineCount() +
-                                          this->GetPendingLineCount());
+        this->cleared_line_count_ += this->pending_line_count_;
         this->points_ += this->ComputePoints();
         this->LevelUp();
         this->SetNextGamePhase(GameState::kGamePlayPhase);
@@ -362,15 +348,15 @@ float Board::GetTimeToNextDrop() {
     if (this->level_ > 29) {
         this->level_ = 29;
     }
-    return this->kFramesPerDrop[this->level_] * this->kTargetSecondsPerFrame;
+    return static_cast<float>(this->kFramesPerDrop[this->level_]) * this->kTargetSecondsPerFrame;
 }
 
 void Board::SetNextGamePhase(const GameState game_phase) {
     this->game_phase_ = game_phase;
 }
 
-size_t Board::ComputePoints() {
-    switch (this->GetPendingLineCount()) {
+size_t Board::ComputePoints() const {
+    switch (this->pending_line_count_) {
         case 1:
             return 40 * (this->level_ + 1);
         case 2:
@@ -384,20 +370,22 @@ size_t Board::ComputePoints() {
     }
 }
 
-int Board::GetLinesForNextLevel() {
-    const int max_condition = this->start_level_ * 10 - 50;
-    const int min_condition = this->start_level_ * 10 - 10;
+size_t Board::GetLinesForNextLevel() const{
+    const int max_condition = static_cast<int>(this->start_level_ * 10 - 50);
+    const int min_condition = static_cast<int>(this->start_level_ * 10 - 10);
     int max = 100 > max_condition ? 100 : max_condition;
     int first_level_up_limit = min_condition < max ? min_condition : max;
-    if (this->level_ == this->start_level_) {
-        return first_level_up_limit;
+    if (this->level_ != this->start_level_) {
+        first_level_up_limit += (int)(this->level_ - this->start_level_) * 10;
     }
-    return first_level_up_limit + (int)(this->level_ - this->start_level_) * 10;
+    if (first_level_up_limit < 0) {
+        first_level_up_limit = 0;
+    }
+    return first_level_up_limit;
 }
 
 void Board::LevelUp() {
-    int lines_for_next_level = this->GetLinesForNextLevel();
-    if ((int)this->GetClearedLineCount() >= lines_for_next_level) {
+    if (this->cleared_line_count_ >= this->GetLinesForNextLevel()) {
         ++this->level_;
     }
 }
