@@ -323,7 +323,6 @@ void Board::UpdateGameStart(const MoveTypes input) {
         this->level_ = this->start_level_;
         this->points_ = 0;
         this->start_time_ = std::chrono::steady_clock::now();
-        this->BoardClean();
         this->SetNextGamePhase(GameState::kGamePlayPhase);
     }
 }
@@ -331,6 +330,7 @@ void Board::UpdateGameStart(const MoveTypes input) {
 void Board::UpdateGameOver(const MoveTypes input) {
     if (input == MoveTypes::kSpace) {
         this->SetNextGamePhase(GameState::kGameStartPhase);
+        this->BoardClean();
     }
 }
 
