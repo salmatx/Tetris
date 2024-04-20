@@ -16,7 +16,7 @@ void Renderer::InitRenderer() {
 }
 
 Renderer::~Renderer() {
-    Piece::Cleanup();
+//    Piece::Cleanup();
     UnloadFont(this->font_);
     CloseWindow();
 }
@@ -59,7 +59,7 @@ void Renderer::RenderGame() const{
 
 void Renderer::DrawPiece(int offset_x, int offset_y, PieceType type) const{
     auto piece_size = this->board_->GetPieceSize(type);
-    auto piece_shape = this->board_->GetPiece(type);
+    auto piece_shape = this->board_->GetPiece(type).get();
     for (int i = 0; i < piece_size; ++i) {
         for (int j = 0; j < piece_size; ++j) {
             uint8_t value = *piece_shape++;
@@ -223,7 +223,7 @@ void Renderer::DrawStartOverlap() const {
 
 void Renderer::DrawShadowPiece(int offset_x, int offset_y) const {
     auto piece_size = this->board_->GetPieceSize(PieceType::kActualPiece);
-    auto piece_shape = this->board_->GetPiece(PieceType::kActualPiece);
+    auto piece_shape = this->board_->GetPiece(PieceType::kActualPiece).get();
     for (int i = 0; i < piece_size; ++i) {
         for (int j = 0; j < piece_size; ++j) {
             uint8_t value = *piece_shape++;

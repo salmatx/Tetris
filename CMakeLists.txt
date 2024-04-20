@@ -4,7 +4,7 @@ project(Tetris)
 # If Wayland is used add -DUSE_WAYLAND=ON to CMake options
 find_package(raylib 4.5.0 REQUIRED)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 option(DISABLE_ASAN "Do not use Address sanitizer" OFF)

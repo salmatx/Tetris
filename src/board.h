@@ -15,7 +15,7 @@ public:
     Board();
     Board(const Board& other);
     Board& operator=(const Board& other);
-    uint8_t* GetPiece(const PieceType type) const;
+    std::shared_ptr<tetrino[]> GetPiece(const PieceType type) const;
     int GetShadowPieceRowPosition();
     int GetPieceRowPosition(const PieceType type) const;
     int GetPieceColumnPosition(const PieceType type) const;
@@ -33,7 +33,7 @@ public:
 
 private:
     struct PieceState {
-        Piece piece;
+        std::shared_ptr<Piece> piece;
         int offset_row;
         int offset_col;
     };

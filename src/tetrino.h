@@ -3,6 +3,7 @@
 #include "common.h"
 
 #include <cstdint>
+#include <memory>
 
 namespace game {
 
@@ -11,25 +12,17 @@ using tetrino = uint8_t;
 class Tetrino {
 public:
     struct TetrinoPiece {
-        tetrino* shape;
+        std::shared_ptr<tetrino[]> shape;
         uint16_t dim;
     };
 
-    Tetrino();
+    explicit Tetrino(Shape shape);
     Tetrino(const Tetrino& other) = delete;
     Tetrino& operator=(const Tetrino& other) = delete;
-    static const TetrinoPiece* Get(Shape shape);
+    std::shared_ptr<TetrinoPiece> Get();
 
 private:
-    static Tetrino* instance_;
-
-    const TetrinoPiece square_;
-    const TetrinoPiece bar_;
-    const TetrinoPiece pyramid_;
-    const TetrinoPiece s_shape_;
-    const TetrinoPiece z_shape_;
-    const TetrinoPiece l_shape_;
-    const TetrinoPiece j_shape_;
+    std::shared_ptr<TetrinoPiece> instance_;
 };
 
 }

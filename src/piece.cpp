@@ -1,6 +1,5 @@
 #include <cmath>
-#include <iostream>
-#include <utility>
+#include <array>
 #include "piece.h"
 
 namespace game {
@@ -8,30 +7,27 @@ namespace game {
 const std::vector<Shape> shapes{Shape::kSquare, Shape::kBar, Shape::kPyramid,
                                 Shape::kSShape, Shape::kZShape, Shape::kLShape,
                                 Shape::kJShape};
-std::unordered_map<Shape, std::vector<std::unique_ptr<Piece>>> Piece::kAllRotations{};
+std::unordered_map<Shape, std::array<std::shared_ptr<Piece>, rotations_count>> Piece::kAllRotations{};
 bool Piece::all_rotations_computed_ = false;
 
 
 Piece::Piece(Shape shape) {
     if (Piece::all_rotations_computed_) {
-        this->shape_ = Piece::kAllRotations.at(shape).at(0)->shape_;
-        this->next_ = Piece::kAllRotations.at(shape).at(1).get();
-        this->dim_ = Piece::kAllRotations.at(shape).at(0)->dim_;
+        this->tetrino_ = std::make_shared<Tetrino::TetrinoPiece>(*Piece::kAllRotations.at(shape).at(0)->tetrino_);
+        this->next_ = Piece::kAllRotations.at(shape).at(1);
     }
     else {
-        this->shape_ = Tetrino::Get(shape)->shape;
-        this->dim_ = Tetrino::Get(shape)->dim;
+        this->tetrino_ = std::make_shared<Tetrino::TetrinoPiece>(*Tetrino(shape).Get());
     }
 }
 
-Piece::Piece(tetrino* shape) : shape_(shape) {}
-
-void Piece::ComputeNextRotation(Piece* rotated_piece, Piece* prev_piece) {
+void Piece::ComputeNextRotation(const std::shared_ptr<Piece>& rotated_piece,
+                                const std::shared_ptr<Piece>& prev_piece) {
     uint16_t count = 0;
-    for (int i = 0; i < rotated_piece->dim_; i++) {
-        for (int j = 0; j < rotated_piece->dim_; j++) {
-            rotated_piece->shape_[count++] = prev_piece->shape_[
-                    (prev_piece->dim_ - j - 1) * prev_piece->dim_ + i];
+    for (int i = 0; i < rotated_piece->tetrino_->dim; i++) {
+        for (int j = 0; j < rotated_piece->tetrino_->dim; j++) {
+            rotated_piece->tetrino_->shape[count++] = prev_piece->tetrino_->shape[
+                    (prev_piece->tetrino_->dim - j - 1) * prev_piece->tetrino_->dim + i];
         }
     }
 }
@@ -43,15 +39,12 @@ void Piece::MakeAllRotations() {
     };
     for (int i = 0; i < rotations_count; ++i) {
         for (const auto& shape: shapes) {
-            auto piece = std::make_unique<Piece>(shape);
-            Piece::kAllRotations[shape].emplace_back(std::move(piece));
+            Piece::kAllRotations[shape][i] = std::make_shared<Piece>(Piece(shape));
 
             if (i) {
-                Piece::kAllRotations.at(shape).at(i)->shape_ = new tetrino[
-                Piece::kAllRotations.at(shape).at(0)->dim_ *
-                Piece::kAllRotations.at(shape).at(0)->dim_];
-                Piece::ComputeNextRotation(Piece::kAllRotations.at(shape).at(i).get(),
-                                           Piece::kAllRotations.at(shape).at(i - 1).get());
+                Piece::kAllRotations.at(shape).at(i) = std::make_shared<Piece>(Piece(shape));
+                Piece::ComputeNextRotation(Piece::kAllRotations.at(shape).at(i),
+                                           Piece::kAllRotations.at(shape).at(i - 1));
             }
         }
     }
@@ -59,44 +52,35 @@ void Piece::MakeAllRotations() {
         for (const auto& shape: shapes) {
             Piece::kAllRotations.at(shape).at(
                     i)->next_ = Piece::kAllRotations.at(shape).at(
-                    point_to_next(i)).get();
+                    point_to_next(i));
         }
     }
     Piece::all_rotations_computed_ = true;
 }
 
 Piece::Piece(const Piece& other) {
-    this->shape_ = other.shape_;
-    this->dim_ = other.dim_;
+    this->tetrino_ = other.tetrino_;
     this->next_ = other.next_;
 }
 
 Piece& Piece::operator=(const Piece& other) {
     Piece tmp{other};
-    std::swap(this->dim_, tmp.dim_);
-    std::swap(this->shape_, tmp.shape_);
+    std::swap(this->tetrino_, tmp.tetrino_);
     std::swap(this->next_, tmp.next_);
     return *this;
 }
 
 uint16_t Piece::GetDim() const {
-    return this->dim_;
+    return this->tetrino_->dim;
 }
 
-void Piece::Cleanup() {
-    for (const auto& [key, value]: Piece::kAllRotations) {
-        for (int i = 1; i < rotations_count; ++i) {
-            delete[] Piece::kAllRotations.at(key).at(i)->shape_;
-        }
-    }
-}
 
-Piece* Piece::FastRotation() const {
+std::weak_ptr<Piece> Piece::FastRotation() const {
     return this->next_;
 }
 
-tetrino* Piece::GetPiece() const {
-    return this->shape_;
+std::shared_ptr<tetrino[]> Piece::GetPiece() const {
+    return this->tetrino_->shape;
 }
 
 }

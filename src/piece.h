@@ -17,22 +17,20 @@ constexpr uint8_t rotations_count = 4; //rotating by 90deg
 class Piece {
 public:
     explicit Piece(Shape shape);
-    explicit Piece(tetrino* shape);
     Piece(const Piece& other);
     Piece& operator=(const Piece& other);
-    Piece* FastRotation() const;
+    std::weak_ptr<Piece> FastRotation() const;
     uint16_t GetDim() const;
-    tetrino* GetPiece() const;
+    std::shared_ptr<tetrino[]> GetPiece() const;
     static void MakeAllRotations();
-    static void Cleanup(); //deallocates memory inside kAllRotations, to be called at the end of game
 
 private:
-    tetrino* shape_;
-    uint16_t dim_;
-    Piece* next_ = nullptr;
+    std::shared_ptr<Tetrino::TetrinoPiece> tetrino_;
+    std::weak_ptr<Piece> next_;
     static bool all_rotations_computed_;
-    static std::unordered_map<Shape, std::vector<std::unique_ptr<Piece>>> kAllRotations;
-    static void ComputeNextRotation(Piece* rotated_piece, Piece* prev_piece);
+    static std::unordered_map<Shape, std::array<std::shared_ptr<Piece>, rotations_count>> kAllRotations;
+    static void ComputeNextRotation(const std::shared_ptr<Piece>& rotated_piece,
+                                    const std::shared_ptr<Piece>& prev_piece);
 };
 
 }

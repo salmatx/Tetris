@@ -26,8 +26,8 @@ uint8_t Board::GetValue(const int row, const int col) const{
 
 bool Board::CheckPieceValid(const Board::PieceState piece) const {
     assert(&piece.piece);
-    tetrino* shape = piece.piece.GetPiece();
-    uint16_t size = piece.piece.GetDim();
+    auto shape = piece.piece->GetPiece().get();
+    uint16_t size = piece.piece->GetDim();
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
             uint8_t value = *shape++;
@@ -48,11 +48,11 @@ bool Board::CheckPieceValid(const Board::PieceState piece) const {
 void Board::MakePiece(int offset_row, int offset_col) {
     if (this->next_piece_ == nullptr) {
         auto shape = this->SelectRandomPiece();
-        this->next_piece_ = std::make_unique<PieceState>(PieceState{Piece{shape}, offset_row, offset_col});
+        this->next_piece_ = std::make_unique<PieceState>(PieceState{std::make_shared<Piece>(Piece{shape}), offset_row, offset_col});
     }
     this->actual_piece_ = std::move(this->next_piece_);
     auto next_shape = this->SelectRandomPiece();
-    this->next_piece_ = std::make_unique<PieceState>(PieceState{Piece{next_shape}, offset_row, offset_col});
+    this->next_piece_ = std::make_unique<PieceState>(PieceState{std::make_shared<Piece>(Piece{next_shape}), offset_row, offset_col});
 }
 
 void Board::MovePieceLeft() {
@@ -73,9 +73,9 @@ void Board::MovePieceRight() {
 
 void Board::RotatePiece() {
     PieceState tmp = *this->actual_piece_;
-    tmp.piece = *tmp.piece.FastRotation();
+    tmp.piece = tmp.piece->FastRotation().lock();
     if (this->CheckPieceValid(tmp)) {
-        this->actual_piece_->piece = *this->actual_piece_->piece.FastRotation();
+        this->actual_piece_->piece = this->actual_piece_->piece->FastRotation().lock();
     }
 }
 
@@ -112,8 +112,8 @@ bool Board::SoftDrop() {
 }
 
 void Board::MergePieceIntoBoard() {
-    tetrino* shape = this->actual_piece_->piece.GetPiece();
-    uint16_t size = this->actual_piece_->piece.GetDim();
+    auto shape = this->actual_piece_->piece->GetPiece().get();
+    uint16_t size = this->actual_piece_->piece->GetDim();
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
             uint8_t value = *shape++;
@@ -131,12 +131,12 @@ Shape Board::SelectRandomPiece() {
     return static_cast<game::Shape>(number);
 }
 
-uint8_t* Board::GetPiece(const PieceType type) const {
+std::shared_ptr<tetrino[]> Board::GetPiece(const PieceType type) const {
     switch (type) {
         case PieceType::kActualPiece:
-            return this->actual_piece_->piece.GetPiece();
+            return this->actual_piece_->piece->GetPiece();
         case PieceType::kNextPiece:
-            return this->next_piece_->piece.GetPiece();
+            return this->next_piece_->piece->GetPiece();
     }
     return nullptr;
 }
@@ -164,9 +164,9 @@ int Board::GetPieceColumnPosition(const PieceType type) const{
 uint16_t Board::GetPieceSize(const PieceType type) const{
     switch (type) {
         case PieceType::kActualPiece:
-            return this->actual_piece_->piece.GetDim();
+            return this->actual_piece_->piece->GetDim();
         case PieceType::kNextPiece:
-            return this->next_piece_->piece.GetDim();
+            return this->next_piece_->piece->GetDim();
     }
     return 0;
 }
