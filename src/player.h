@@ -3,16 +3,17 @@
 #include <cstddef>
 #include <raylib.h>
 #include "board.h"
+#include "i_player.h"
 
 namespace game {
 
-class Renderer {
+class Player : public IPlayer{
 public:
-    explicit Renderer(IBoard &board);
-    ~Renderer();
+    explicit Player(IBoard &board);
+    ~Player();
     void InitRenderer();
     void GameLoop();
-    MoveTypes GetMoveType() const;
+    MoveTypes GetMoveType() const override;
 
 private:
     const size_t kScreenHeight_;

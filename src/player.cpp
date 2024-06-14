@@ -1,26 +1,25 @@
 #include <iostream>
-#include "renderer.h"
+#include "player.h"
 #include "color.h"
 
 namespace game {
 
-Renderer::Renderer(IBoard &board) : board_(board), kScreenHeight_(720), kScreenWidth_(440) {
+Player::Player(IBoard &board) : board_(board), kScreenHeight_(720), kScreenWidth_(440) {
     this->kBackgroundColor_ = BLACK;
-//    Piece::MakeAllRotations();
 }
 
-void Renderer::InitRenderer() {
+void Player::InitRenderer() {
     InitWindow(this->kScreenWidth_, this->kScreenHeight_, this->kTitle_);
     this->font_ = LoadFont("../src/fonts/novem___.ttf");
     SetTargetFPS(60);
 }
 
-Renderer::~Renderer() {
+Player::~Player() {
     UnloadFont(this->font_);
     CloseWindow();
 }
 
-void Renderer::GameLoop() {
+void Player::GameLoop() {
     while (!WindowShouldClose()) {
         auto input = this->GetMoveType();
         this->board_.UpdateGame(input);
@@ -28,7 +27,7 @@ void Renderer::GameLoop() {
     }
 }
 
-void Renderer::RenderGame() const{
+void Player::RenderGame() const{
     BeginDrawing();
     ClearBackground(this->kBackgroundColor_);
     if (this->board_.GetActualGamePhase() == GameState::kGameStartPhase) {
@@ -55,7 +54,7 @@ void Renderer::RenderGame() const{
     EndDrawing();
 }
 
-void Renderer::DrawPiece(int offset_x, int offset_y, PieceType type) const{
+void Player::DrawPiece(int offset_x, int offset_y, PieceType type) const{
     auto piece_size = this->board_.GetPieceSize(type);
     auto piece_shape = this->board_.GetPiece(type).get();
     for (int i = 0; i < piece_size; ++i) {
@@ -70,7 +69,7 @@ void Renderer::DrawPiece(int offset_x, int offset_y, PieceType type) const{
     }
 }
 
-void Renderer::DrawCell(int row, int col, int value, int offset_row, int offset_col, bool outline) const {
+void Player::DrawCell(int row, int col, int value, int offset_row, int offset_col, bool outline) const {
     auto base_color_scheme = ColorScheme(ColorSchemes::kBaseColors, value);
     auto light_color_scheme = ColorScheme(ColorSchemes::kLightColors, value);
     auto dark_color_scheme = ColorScheme(ColorSchemes::kDarkColors, value);
@@ -99,7 +98,7 @@ void Renderer::DrawCell(int row, int col, int value, int offset_row, int offset_
     }
 }
 
-MoveTypes Renderer::GetMoveType() const {
+MoveTypes Player::GetMoveType() const {
     double wait_for_key_down = 0.05;
     if (IsKeyPressed(KEY_LEFT) && IsKeyReleased(KEY_LEFT))
         return MoveTypes::kLeft;
@@ -122,7 +121,7 @@ MoveTypes Renderer::GetMoveType() const {
     return MoveTypes::kNone;
 }
 
-void Renderer::DrawBoard() const{
+void Player::DrawBoard() const{
     auto board = this->board_.GetBoard();
     int board_height = this->board_.GetBoardHeight();
     int board_width = this->board_.GetBoardWidth();
@@ -135,13 +134,13 @@ void Renderer::DrawBoard() const{
     DrawBoardOutline();
 }
 
-void Renderer::DrawBoardOutline() const {
+void Player::DrawBoardOutline() const {
     int width = this->board_.GetBoardWidth() * this->kGridSize_;
     int height = this->board_.GetBoardHeight() * this->kGridSize_;
     DrawRectangleLines(0, this->kMarginY_, width, height, WHITE);
 }
 
-void Renderer::DrawLineClearingHighlight() const {
+void Player::DrawLineClearingHighlight() const {
     for (int i = 0; i < this->board_.GetBoardHeight(); ++i) {
         if (this->board_.IsLineClearing(i)) {
             DrawRectangle(0, i * this->kGridSize_ + this->kMarginY_, this->kGridSize_ * this->board_.GetBoardWidth(),
@@ -150,7 +149,7 @@ void Renderer::DrawLineClearingHighlight() const {
     }
 }
 
-void Renderer::DrawString(Font font, float font_size, const char* msg, size_t x, size_t y, TextAlignment alignment, Color color) const {
+void Player::DrawString(Font font, float font_size, const char* msg, size_t x, size_t y, TextAlignment alignment, Color color) const {
     const int spacing = -2;
     float x_pos;
     float y_pos = (float)y;
@@ -169,7 +168,7 @@ void Renderer::DrawString(Font font, float font_size, const char* msg, size_t x,
     DrawTextEx(font, msg, position, font_size, spacing, color);
 }
 
-void Renderer::DrawStartScreen() const {
+void Player::DrawStartScreen() const {
     char buffer[2048];
     std::sprintf(buffer, "START LEVEL: %ld", this->board_.GetStartLevel());
     float x = this->kScreenWidth_ / 2.0f;
@@ -198,7 +197,7 @@ void Renderer::DrawStartScreen() const {
     this->DrawString(this->font_, this->font_.baseSize, "SPACE KEY", x + 120, y, TextAlignment::kLeft, WHITE);
 }
 
-void Renderer::DrawGameInfo() const {
+void Player::DrawGameInfo() const {
     char buffer[2048];
     std::sprintf(buffer, "LEVEL: %ld", this->board_.GetLevel());
     float x = 0;
@@ -219,12 +218,12 @@ void Renderer::DrawGameInfo() const {
     this->DrawPiece(x, y, PieceType::kNextPiece);
 }
 
-void Renderer::DrawStartOverlap() const {
+void Player::DrawStartOverlap() const {
     DrawRectangle(0, this->kMarginY_, this->board_.GetBoardWidth() * this->kGridSize_,
                   2 * this->kGridSize_, this->kBackgroundColor_);
 }
 
-void Renderer::DrawShadowPiece(int offset_x, int offset_y) const {
+void Player::DrawShadowPiece(int offset_x, int offset_y) const {
     auto piece_size = this->board_.GetPieceSize(PieceType::kActualPiece);
     auto piece_shape = this->board_.GetPiece(PieceType::kActualPiece).get();
     for (int i = 0; i < piece_size; ++i) {
