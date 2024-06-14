@@ -8,7 +8,7 @@ namespace game {
 
 class Renderer {
 public:
-    Renderer();
+    explicit Renderer(IBoard &board);
     ~Renderer();
     void InitRenderer();
     void GameLoop();
@@ -20,9 +20,9 @@ private:
     const int kGridSize_ = 30;
     const int kMarginY_ = 60;
     const char* kTitle_ = "Tetris";
-    Color kBackgroundColor_;
-    std::unique_ptr<Board> board_;
-    Font font_;
+    Color kBackgroundColor_{};
+    IBoard &board_;
+    Font font_{};
 
     void RenderGame() const;
     void DrawPiece(int offset_x, int offset_y, PieceType type) const;

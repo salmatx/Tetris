@@ -5,7 +5,8 @@
 using namespace game;
 
 int main() {
-    Renderer renderer{};
+    Board board{};
+    Renderer renderer{board};
     renderer.InitRenderer();
     renderer.GameLoop();
 

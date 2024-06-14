@@ -13,6 +13,7 @@ std::uniform_int_distribution<uint8_t> uniform_dist(0, static_cast<int>(game::Sh
 Board::Board() :
         board_(this->height_, std::vector<uint8_t>(this->width_)) {
     this->lines_to_clear_.reserve(this->height_);
+    Piece::MakeAllRotations();
     this->MakePiece(0, this->width_ / 2 - 1);
 }
 

@@ -1,35 +1,32 @@
 #pragma once
 
-#include "common.h"
-#include "piece.h"
+#include "i_board.h"
 
-#include <cstddef>
-#include <vector>
 #include <cstdint>
 #include <chrono>
 
 namespace game {
 
-class Board {
+class Board : public IBoard{
 public:
     Board();
     Board(const Board& other);
     Board& operator=(const Board& other);
-    std::shared_ptr<tetrino[]> GetPiece(const PieceType type) const;
-    int GetShadowPieceRowPosition();
-    int GetPieceRowPosition(const PieceType type) const;
-    int GetPieceColumnPosition(const PieceType type) const;
-    uint16_t GetPieceSize(const PieceType type) const;
-    uint8_t GetBoardHeight() const;
-    uint8_t GetBoardWidth() const;
-    std::vector<std::vector<uint8_t>> GetBoard() const;
-    size_t GetClearedLineCount() const;
-    bool IsLineClearing(int index) const;
-    void UpdateGame(MoveTypes input);
-    GameState GetActualGamePhase() const;
-    size_t GetStartLevel() const;
-    size_t GetLevel() const;
-    size_t GetPoints() const;
+    std::shared_ptr<tetrino[]> GetPiece(const PieceType type) const override;
+    int GetShadowPieceRowPosition() override;
+    int GetPieceRowPosition(const PieceType type) const override;
+    int GetPieceColumnPosition(const PieceType type) const override;
+    uint16_t GetPieceSize(const PieceType type) const override;
+    uint8_t GetBoardHeight() const override;
+    uint8_t GetBoardWidth() const override;
+    std::vector<std::vector<uint8_t>> GetBoard() const override;
+    size_t GetClearedLineCount() const override;
+    bool IsLineClearing(int index) const override;
+    void UpdateGame(MoveTypes input) override;
+    GameState GetActualGamePhase() const override;
+    size_t GetStartLevel() const override;
+    size_t GetLevel() const override;
+    size_t GetPoints() const override;
 
 private:
     struct PieceState {

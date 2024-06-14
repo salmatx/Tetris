@@ -33,29 +33,31 @@ void Piece::ComputeNextRotation(const std::shared_ptr<Piece>& rotated_piece,
 }
 
 void Piece::MakeAllRotations() {
-    auto point_to_next = [&](int index) -> int {
-        auto res = index < (rotations_count - 1) ? ++index : 0;
-        return res;
-    };
-    for (int i = 0; i < rotations_count; ++i) {
-        for (const auto& shape: shapes) {
-            Piece::kAllRotations[shape][i] = std::make_shared<Piece>(Piece(shape));
+    if (!Piece::all_rotations_computed_) {
+        auto point_to_next = [&](int index) -> int {
+            auto res = index < (rotations_count - 1) ? ++index : 0;
+            return res;
+        };
+        for (int i = 0; i < rotations_count; ++i) {
+            for (const auto& shape: shapes) {
+                Piece::kAllRotations[shape][i] = std::make_shared<Piece>(Piece(shape));
 
-            if (i) {
-                Piece::kAllRotations.at(shape).at(i) = std::make_shared<Piece>(Piece(shape));
-                Piece::ComputeNextRotation(Piece::kAllRotations.at(shape).at(i),
-                                           Piece::kAllRotations.at(shape).at(i - 1));
+                if (i) {
+                    Piece::kAllRotations.at(shape).at(i) = std::make_shared<Piece>(Piece(shape));
+                    Piece::ComputeNextRotation(Piece::kAllRotations.at(shape).at(i),
+                                               Piece::kAllRotations.at(shape).at(i - 1));
+                }
             }
         }
-    }
-    for (int i = 0; i < rotations_count; ++i) {
-        for (const auto& shape: shapes) {
-            Piece::kAllRotations.at(shape).at(
-                    i)->next_ = Piece::kAllRotations.at(shape).at(
-                    point_to_next(i));
+        for (int i = 0; i < rotations_count; ++i) {
+            for (const auto& shape: shapes) {
+                Piece::kAllRotations.at(shape).at(
+                        i)->next_ = Piece::kAllRotations.at(shape).at(
+                        point_to_next(i));
+            }
         }
+        Piece::all_rotations_computed_ = true;
     }
-    Piece::all_rotations_computed_ = true;
 }
 
 Piece::Piece(const Piece& other) {
