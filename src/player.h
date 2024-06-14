@@ -13,7 +13,7 @@ public:
     ~Player();
     void InitRenderer();
     void GameLoop();
-    MoveTypes GetMoveType() const override;
+    std::optional<MoveTypes> GetMoveType() const override;
 
 private:
     const size_t kScreenHeight_;

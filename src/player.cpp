@@ -4,7 +4,7 @@
 
 namespace game {
 
-Player::Player(IBoard &board) : board_(board), kScreenHeight_(720), kScreenWidth_(440) {
+Player::Player(IBoard &board) : kScreenHeight_(720), kScreenWidth_(440), board_(board) {
     this->kBackgroundColor_ = BLACK;
 }
 
@@ -21,7 +21,7 @@ Player::~Player() {
 
 void Player::GameLoop() {
     while (!WindowShouldClose()) {
-        auto input = this->GetMoveType();
+        auto input = this->GetMoveType().value();
         this->board_.UpdateGame(input);
         this->RenderGame();
     }
@@ -98,7 +98,7 @@ void Player::DrawCell(int row, int col, int value, int offset_row, int offset_co
     }
 }
 
-MoveTypes Player::GetMoveType() const {
+std::optional<MoveTypes> Player::GetMoveType() const {
     double wait_for_key_down = 0.05;
     if (IsKeyPressed(KEY_LEFT) && IsKeyReleased(KEY_LEFT))
         return MoveTypes::kLeft;
@@ -118,7 +118,7 @@ MoveTypes Player::GetMoveType() const {
         WaitTime(wait_for_key_down);
         return MoveTypes::kRight;
     }
-    return MoveTypes::kNone;
+    return std::nullopt;
 }
 
 void Player::DrawBoard() const{

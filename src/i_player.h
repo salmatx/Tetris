@@ -6,7 +6,7 @@ namespace game {
 
 class IPlayer {
 public:
-    virtual MoveTypes GetMoveType() const = 0;
+    virtual std::optional<MoveTypes> GetMoveType() const = 0;
 };
 
 }

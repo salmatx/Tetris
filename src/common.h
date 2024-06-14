@@ -3,7 +3,7 @@
 namespace game {
 
 enum class MoveTypes {
-    kLeft, kRight, kUp, kDown, kSpace, kNone
+    kLeft, kRight, kUp, kDown, kSpace
 };
 
 enum class Shape {
