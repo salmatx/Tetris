@@ -22,12 +22,15 @@ public:
     std::vector<std::vector<uint8_t>> GetBoard() const override;
     size_t GetClearedLineCount() const override;
     bool IsLineClearing(int index) const override;
-    GameState UpdateGame(MoveType input, GameState game_state) override;
+    GameState UpdateGame(MoveType input) override;
     GameState GetActualGamePhase() const override;
     size_t GetStartLevel() const override;
     size_t GetLevel() const override;
     size_t GetPoints() const override;
     void SetStartLevel(size_t level) override;
+    void StartGame() override;
+    void PlayGame() override;
+    void GameOver() override;
 
 private:
     struct PieceState {
@@ -61,7 +64,7 @@ private:
 
     void UpdateGameplay(const MoveType input);
     void UpdateGameStart();
-    void UpdateGameOver(const MoveType input);
+    void UpdateGameOver();
     void UpdateGameLines();
     void MovePiece(const MoveType move);
     void MovePieceLeft();

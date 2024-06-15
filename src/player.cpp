@@ -24,9 +24,7 @@ void Player::DrawPlayer() const{
     }
     if (this->board_.GetActualGamePhase() == GameState::kGameOverPhase) {
         this->DrawBoard();
-        size_t x = this->board_.GetBoardWidth() * this->kGridSize_ / 2;
-        size_t y = (this->board_.GetBoardHeight() * this->kGridSize_ + this->kMarginY_) / 2;
-        game::DrawString(this->font_, this->font_.baseSize * 1.5, "GAME OVER", x, y, TextAlignment::kCenter, WHITE);
+        this->DrawGameInfo();
     }
 }
 
@@ -144,8 +142,8 @@ void Player::DrawShadowPiece() const {
     }
 }
 
-GameState Player::UpdatePlayer(MoveType input, GameState game_state) {
-    return this->board_.UpdateGame(input, game_state);
+GameState Player::UpdatePlayer(MoveType input) {
+    return this->board_.UpdateGame(input);
 }
 
 void Player::SetStartLevel(size_t level) {
@@ -154,6 +152,18 @@ void Player::SetStartLevel(size_t level) {
 
 void Player::SetFont(const Font& font) {
     this->font_ = font;
+}
+
+void Player::StartGame() {
+    this->board_.StartGame();
+}
+
+void Player::PlayGame() {
+    this->board_.PlayGame();
+}
+
+void Player::GameOver() {
+    this->board_.GameOver();
 }
 
 }

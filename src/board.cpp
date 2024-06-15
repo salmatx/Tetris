@@ -253,8 +253,7 @@ int Board::GetShadowPieceRowPosition(){
     return shadow_piece.offset_row;
 }
 
-GameState Board::UpdateGame(MoveType input, GameState game_state) {
-    this->game_phase_ = game_state;
+GameState Board::UpdateGame(MoveType input) {
     this->current_time_ = std::chrono::steady_clock::now();
     this->time_duration_ =
             std::chrono::duration_cast<std::chrono::duration<float>>
@@ -270,7 +269,7 @@ GameState Board::UpdateGame(MoveType input, GameState game_state) {
             this->UpdateGameLines();
             break;
         case GameState::kGameOverPhase:
-            this->UpdateGameOver(input);
+            this->UpdateGameOver();
             break;
     }
 
@@ -322,11 +321,8 @@ void Board::UpdateGameStart() {
     this->start_time_ = std::chrono::steady_clock::now();
 }
 
-void Board::UpdateGameOver(const MoveType input) {
-    if (input == MoveType::kDrop) {
-        this->SetNextGamePhase(GameState::kGameStartPhase);
-        this->BoardClean();
-    }
+void Board::UpdateGameOver() {
+    this->BoardClean();
 }
 
 void Board::UpdateGameLines() {
@@ -436,6 +432,18 @@ Board& Board::operator=(const Board& other) {
 
 void Board::SetStartLevel(size_t level) {
     this->start_level_ = level;
+}
+
+void Board::StartGame() {
+    this->SetNextGamePhase(GameState::kGameStartPhase);
+}
+
+void Board::PlayGame() {
+    this->SetNextGamePhase(GameState::kGamePlayPhase);
+}
+
+void Board::GameOver() {
+    this->SetNextGamePhase(GameState::kGameOverPhase);
 }
 
 }

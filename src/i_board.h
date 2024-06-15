@@ -20,12 +20,15 @@ public:
     virtual std::vector<std::vector<uint8_t>> GetBoard() const = 0;
     virtual size_t GetClearedLineCount() const = 0;
     virtual bool IsLineClearing(int index) const= 0;
-    virtual GameState UpdateGame(MoveType input, GameState game_state) = 0;
+    virtual GameState UpdateGame(MoveType input) = 0;
     virtual GameState GetActualGamePhase() const = 0;
     virtual size_t GetStartLevel() const = 0;
     virtual size_t GetLevel() const = 0;
     virtual size_t GetPoints() const = 0;
     virtual void SetStartLevel(size_t level) = 0;
+    virtual void StartGame() = 0;
+    virtual void PlayGame() = 0;
+    virtual void GameOver() = 0;
     virtual ~IBoard() = default;
 };
 

@@ -27,24 +27,39 @@ void Game::GameLoop() {
             input = PlayerMove{MoveType::kNone, PlayerType::kPlayerNone};
         }
 
-        if (this->game_phase_ == GameState::kGameStartPhase) {
-            this->UpdateGameStart(input.moveType);
-            this->DrawStartScreen();
-            for (auto& player : players_) {
-                 player->UpdatePlayer(input.moveType, this->game_phase_);
-            }
-        }
+        switch (this->game_phase_) {
+            case GameState::kGameStartPhase:
+                this->UpdateGameStart(input.moveType);
+                this->DrawStartScreen();
+                break;
 
-        switch (input.player) {
-            case PlayerType::kPlayer1:
-                this->game_phase_ = this->players_.at(0)->UpdatePlayer(input.moveType, this->game_phase_);
+            case GameState::kGameOverPhase: {
+                this->UpdateGameOver(input.moveType);
+                size_t x = this->kScreenWidth_ / 2;
+                size_t y = this->kScreenHeight_ / 2 - 80;
+                game::DrawString(this->font_, this->font_.baseSize * 2.5,
+                                 "GAME OVER", x, y, TextAlignment::kCenter,
+                                 WHITE);
                 break;
-            case PlayerType::kPlayer2:
-                this->game_phase_ = this->players_.at(1)->UpdatePlayer(input.moveType, this->game_phase_);
-                break;
-            case PlayerType::kPlayerNone:
-                this->game_phase_ = this->players_.at(0)->UpdatePlayer(input.moveType, this->game_phase_);
-                this->game_phase_ = this->players_.at(1)->UpdatePlayer(input.moveType, this->game_phase_);
+            }
+
+            case GameState::kGamePlayPhase:
+            case GameState::kGameLinePhase:
+                switch (input.player) {
+                    case PlayerType::kPlayer1:
+                        this->game_phase_ = this->players_.at(0)->UpdatePlayer(input.moveType);
+                        break;
+                    case PlayerType::kPlayer2:
+                        this->game_phase_ = this->players_.at(1)->UpdatePlayer(input.moveType);
+                        break;
+                    case PlayerType::kPlayerNone:
+                        for (const auto &player : this->players_) {
+                            this->game_phase_ = player->UpdatePlayer(input.moveType);
+                            if (this->game_phase_ == GameState::kGameOverPhase)
+                                break;
+                        }
+                        break;
+                }
                 break;
         }
 
@@ -62,14 +77,12 @@ void Game::RenderGame() const {
 }
 
 std::optional<PlayerMove> Game::GetMoveType() const {
-    double wait_for_key_down = 0.05;
-
     if (IsKeyPressed(KEY_ENTER))
         return PlayerMove{MoveType::kConfirm, PlayerType::kPlayer1};
 
-    if (IsKeyPressed(KEY_A) && IsKeyReleased(KEY_A))
+    if (IsKeyPressed(KEY_A))
         return PlayerMove{MoveType::kLeft, PlayerType::kPlayer1};
-    if (IsKeyPressed(KEY_D) && IsKeyReleased(KEY_D))
+    if (IsKeyPressed(KEY_D))
         return PlayerMove{MoveType::kRight, PlayerType::kPlayer1};
     if (IsKeyPressed(KEY_W))
         return PlayerMove{MoveType::kUp, PlayerType::kPlayer1};
@@ -77,18 +90,10 @@ std::optional<PlayerMove> Game::GetMoveType() const {
         return PlayerMove{MoveType::kDown, PlayerType::kPlayer1};
     if (IsKeyPressed(KEY_LEFT_CONTROL))
         return PlayerMove{MoveType::kDrop, PlayerType::kPlayer1};
-    if (IsKeyDown(KEY_A)) {
-        WaitTime(wait_for_key_down);
-        return PlayerMove{MoveType::kLeft, PlayerType::kPlayer1};
-    }
-    if (IsKeyDown(KEY_D)) {
-        WaitTime(wait_for_key_down);
-        return PlayerMove{MoveType::kRight, PlayerType::kPlayer1};
-    }
 
-    if (IsKeyPressed(KEY_LEFT) && IsKeyReleased(KEY_LEFT))
+    if (IsKeyPressed(KEY_LEFT))
         return PlayerMove{MoveType::kLeft, PlayerType::kPlayer2};
-    if (IsKeyPressed(KEY_RIGHT) && IsKeyReleased(KEY_RIGHT))
+    if (IsKeyPressed(KEY_RIGHT))
         return PlayerMove{MoveType::kRight, PlayerType::kPlayer2};
     if (IsKeyPressed(KEY_UP))
         return PlayerMove{MoveType::kUp, PlayerType::kPlayer2};
@@ -96,14 +101,6 @@ std::optional<PlayerMove> Game::GetMoveType() const {
         return PlayerMove{MoveType::kDown, PlayerType::kPlayer2};
     if (IsKeyPressed(KEY_RIGHT_CONTROL))
         return PlayerMove{MoveType::kDrop, PlayerType::kPlayer2};
-    if (IsKeyDown(KEY_LEFT)) {
-        WaitTime(wait_for_key_down);
-        return PlayerMove{MoveType::kLeft, PlayerType::kPlayer2};
-    }
-    if (IsKeyDown(KEY_RIGHT)) {
-        WaitTime(wait_for_key_down);
-        return PlayerMove{MoveType::kRight, PlayerType::kPlayer2};
-    }
 
     return std::nullopt;
 }
@@ -120,6 +117,11 @@ void Game::UpdateGameStart(const MoveType input) {
             player->SetStartLevel(this->start_level_);
         }
         this->game_phase_ = GameState::kGamePlayPhase;
+        for (const auto &player : players_) {
+            player->StartGame();
+            player->UpdatePlayer(MoveType::kNone);
+            player->PlayGame();
+        }
     }
 }
 
@@ -127,29 +129,62 @@ void Game::DrawStartScreen() const {
     char buffer[2048];
     std::sprintf(buffer, "START LEVEL: %ld", this->start_level_);
     float x = this->kScreenWidth_ / 2.0f;
-    float y = this->kScreenHeight_ / 2.0f - 100.0f;
+    float y = this->kScreenHeight_ / 2.0f - 200.0f;
     float spacing = 30;
     game::DrawString(this->font_, this->font_.baseSize * 1.5, "TETRIS", x, y, TextAlignment::kCenter, WHITE);
     y += spacing;
     game::DrawString(this->font_, this->font_.baseSize * 1.5, buffer, x, y, TextAlignment::kCenter, WHITE);
+    x = this->kScreenWidth_ / 2.0f;
     y += 3 * spacing;
-    game::DrawString(this->font_, this->font_.baseSize * 1.2, "CONTROLS", x, y, TextAlignment::kCenter, WHITE);
-    x = this->kScreenWidth_ / 2.0f - 120;
+    game::DrawString(this->font_, this->font_.baseSize, "START GAME:      ENTER", x, y, TextAlignment::kCenter, WHITE);
+    y += spacing;
+    game::DrawString(this->font_, this->font_.baseSize, "SELECT LEVEL:      UP KEY (W) / DOWN KEY (S)", x, y, TextAlignment::kCenter, WHITE);
     y += 2 * spacing;
-    game::DrawString(this->font_, this->font_.baseSize, "SELECT LEVEL:", x, y, TextAlignment::kLeft, WHITE);
-    game::DrawString(this->font_, this->font_.baseSize, "UP KEY / DOWN KEY", x + 120, y, TextAlignment::kLeft, WHITE);
-    y += spacing;
-    game::DrawString(this->font_, this->font_.baseSize, "MOVE:", x, y, TextAlignment::kLeft, WHITE);
-    game::DrawString(this->font_, this->font_.baseSize, "LEFT KEY / RIGHT KEY", x + 120, y, TextAlignment::kLeft, WHITE);
-    y += spacing;
-    game::DrawString(this->font_, this->font_.baseSize, "ROTATE:", x, y, TextAlignment::kLeft, WHITE);
-    game::DrawString(this->font_, this->font_.baseSize, "UP KEY", x + 120, y, TextAlignment::kLeft, WHITE);
-    y += spacing;
-    game::DrawString(this->font_, this->font_.baseSize, "FAST DROP:", x, y, TextAlignment::kLeft, WHITE);
-    game::DrawString(this->font_, this->font_.baseSize, "DOWN KEY", x + 120, y, TextAlignment::kLeft, WHITE);
-    y += spacing;
-    game::DrawString(this->font_, this->font_.baseSize, "HARD DROP:", x, y, TextAlignment::kLeft, WHITE);
-    game::DrawString(this->font_, this->font_.baseSize, "SPACE KEY", x + 120, y, TextAlignment::kLeft, WHITE);
+    game::DrawString(this->font_, this->font_.baseSize * 1.2, "CONTROLS", x, y, TextAlignment::kCenter, WHITE);
+    y += 2 * spacing;
+    auto x1 = x - 200;
+    auto x2 = x + 140;
+    auto y1 = y;
+    auto y2 = y;
+    game::DrawString(this->font_, this->font_.baseSize, "PLAYER 1", x1, y1, TextAlignment::kLeft, WHITE);
+    x1 -= 80;
+    y1 += 2 * spacing;
+    game::DrawString(this->font_, this->font_.baseSize, "MOVE:", x1, y1, TextAlignment::kLeft, WHITE);
+    game::DrawString(this->font_, this->font_.baseSize, "A / D", x1 + 120, y1, TextAlignment::kLeft, WHITE);
+    y1 += spacing;
+    game::DrawString(this->font_, this->font_.baseSize, "ROTATE:", x1, y1, TextAlignment::kLeft, WHITE);
+    game::DrawString(this->font_, this->font_.baseSize, "W", x1 + 120, y1, TextAlignment::kLeft, WHITE);
+    y1 += spacing;
+    game::DrawString(this->font_, this->font_.baseSize, "FAST DROP:", x1, y1, TextAlignment::kLeft, WHITE);
+    game::DrawString(this->font_, this->font_.baseSize, "S", x1 + 120, y1, TextAlignment::kLeft, WHITE);
+    y1 += spacing;
+    game::DrawString(this->font_, this->font_.baseSize, "HARD DROP:", x1, y1, TextAlignment::kLeft, WHITE);
+    game::DrawString(this->font_, this->font_.baseSize, "LEFT CONTROL", x1 + 120, y1, TextAlignment::kLeft, WHITE);
+
+    game::DrawString(this->font_, this->font_.baseSize, "PLAYER 2", x2, y2, TextAlignment::kLeft, WHITE);
+    x2 -= 80;
+    y2 += 2 * spacing;
+    game::DrawString(this->font_, this->font_.baseSize, "MOVE:", x2, y2, TextAlignment::kLeft, WHITE);
+    game::DrawString(this->font_, this->font_.baseSize, "LEFT KEY / RIGHT KEY", x2 + 120, y2, TextAlignment::kLeft, WHITE);
+    y2 += spacing;
+    game::DrawString(this->font_, this->font_.baseSize, "ROTATE:", x2, y2, TextAlignment::kLeft, WHITE);
+    game::DrawString(this->font_, this->font_.baseSize, "UP KEY", x2 + 120, y2, TextAlignment::kLeft, WHITE);
+    y2 += spacing;
+    game::DrawString(this->font_, this->font_.baseSize, "FAST DROP:", x2, y2, TextAlignment::kLeft, WHITE);
+    game::DrawString(this->font_, this->font_.baseSize, "DOWN KEY", x2 + 120, y2, TextAlignment::kLeft, WHITE);
+    y2 += spacing;
+    game::DrawString(this->font_, this->font_.baseSize, "HARD DROP:", x2, y2, TextAlignment::kLeft, WHITE);
+    game::DrawString(this->font_, this->font_.baseSize, "RIGHT CONTROL", x2 + 120, y2, TextAlignment::kLeft, WHITE);
+}
+
+void Game::UpdateGameOver(const MoveType input) {
+    if (input == MoveType::kConfirm) {
+        for (const auto& player: players_) {
+            player->GameOver();
+            player->UpdatePlayer(MoveType::kNone);
+        }
+        this->game_phase_ = GameState::kGameStartPhase;
+    }
 }
 
 void DrawString(Font font, float font_size, const char* msg, size_t x, size_t y,

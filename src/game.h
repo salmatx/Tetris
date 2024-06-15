@@ -39,6 +39,7 @@ private:
 
     void RenderGame() const;
     void UpdateGameStart(const MoveType input);
+    void UpdateGameOver(const MoveType input);
     void DrawStartScreen() const;
 };
 

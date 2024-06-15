@@ -11,9 +11,12 @@ class Player : public IPlayer{
 public:
     explicit Player(IBoard &board, const int x_offset);
     void DrawPlayer() const override;
-    GameState UpdatePlayer(MoveType input, GameState game_state) override;
+    GameState UpdatePlayer(MoveType input) override;
     void SetStartLevel(size_t level) override;
     void SetFont(const Font &font) override;
+    void StartGame() override;
+    void PlayGame() override;
+    void GameOver() override;
 
 private:
     const int kGridSize_ = 30;
