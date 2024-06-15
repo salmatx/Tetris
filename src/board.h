@@ -1,13 +1,14 @@
 #pragma once
 
 #include "i_board.h"
+#include "i_save_service.h"
 
 #include <cstdint>
 #include <chrono>
 
 namespace game {
 
-class Board : public IBoard{
+class Board : public IBoard, public ISaveService{
 public:
     Board();
     Board(const Board& other);
@@ -31,6 +32,7 @@ public:
     void StartGame() override;
     void PlayGame() override;
     void GameOver() override;
+    json SaveToJson(std::string_view path) override;
 
 private:
     struct PieceState {

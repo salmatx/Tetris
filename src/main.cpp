@@ -11,8 +11,8 @@ int main() {
     Board board_1{};
     Board board_2{};
     Player player_1{board_1, 0};
-    Player player_2{board_2, 440};
-    Game game{window_height, window_width, game::font_type, player_1, player_2};
+    Player player_2{board_2, window_width / 2};
+    Game<2> game{window_height, window_width, game::font_type, player_1, player_2};
     game.InitRenderer();
     game.GameLoop();
 

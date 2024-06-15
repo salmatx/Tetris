@@ -3,12 +3,19 @@
 
 namespace game {
 
-Game::~Game() {
+template class Game<1>;
+template class Game<2>;
+
+template <std::uint8_t N>
+requires ValidPlayerCount<N>
+Game<N>::~Game() {
     UnloadFont(this->font_);
     CloseWindow();
 }
 
-void Game::InitRenderer() {
+template <std::uint8_t N>
+requires ValidPlayerCount<N>
+void Game<N>::InitRenderer() {
     InitWindow(this->kScreenWidth_, this->kScreenHeight_, this->kTitle_);
     this->font_ = LoadFont(font_type_);
     for (auto &player : players_) {
@@ -17,7 +24,9 @@ void Game::InitRenderer() {
     SetTargetFPS(60);
 }
 
-void Game::GameLoop() {
+template <std::uint8_t N>
+requires ValidPlayerCount<N>
+void Game<N>::GameLoop() {
     while (!WindowShouldClose()) {
         PlayerMove input;
         try {
@@ -67,7 +76,9 @@ void Game::GameLoop() {
     }
 }
 
-void Game::RenderGame() const {
+template <std::uint8_t N>
+requires ValidPlayerCount<N>
+void Game<N>::RenderGame() const {
     BeginDrawing();
     ClearBackground(game::kBackgroundColor);
     for (const auto& player : players_) {
@@ -76,7 +87,9 @@ void Game::RenderGame() const {
     EndDrawing();
 }
 
-std::optional<PlayerMove> Game::GetMoveType() const {
+template <std::uint8_t N>
+requires ValidPlayerCount<N>
+std::optional<PlayerMove> Game<N>::GetMoveType() const {
     if (IsKeyPressed(KEY_ENTER))
         return PlayerMove{MoveType::kConfirm, PlayerType::kPlayer1};
 
@@ -91,21 +104,25 @@ std::optional<PlayerMove> Game::GetMoveType() const {
     if (IsKeyPressed(KEY_LEFT_CONTROL))
         return PlayerMove{MoveType::kDrop, PlayerType::kPlayer1};
 
-    if (IsKeyPressed(KEY_LEFT))
-        return PlayerMove{MoveType::kLeft, PlayerType::kPlayer2};
-    if (IsKeyPressed(KEY_RIGHT))
-        return PlayerMove{MoveType::kRight, PlayerType::kPlayer2};
-    if (IsKeyPressed(KEY_UP))
-        return PlayerMove{MoveType::kUp, PlayerType::kPlayer2};
-    if (IsKeyPressed(KEY_DOWN))
-        return PlayerMove{MoveType::kDown, PlayerType::kPlayer2};
-    if (IsKeyPressed(KEY_RIGHT_CONTROL))
-        return PlayerMove{MoveType::kDrop, PlayerType::kPlayer2};
+    if (N == 2) {
+        if (IsKeyPressed(KEY_LEFT))
+            return PlayerMove{MoveType::kLeft, PlayerType::kPlayer2};
+        if (IsKeyPressed(KEY_RIGHT))
+            return PlayerMove{MoveType::kRight, PlayerType::kPlayer2};
+        if (IsKeyPressed(KEY_UP))
+            return PlayerMove{MoveType::kUp, PlayerType::kPlayer2};
+        if (IsKeyPressed(KEY_DOWN))
+            return PlayerMove{MoveType::kDown, PlayerType::kPlayer2};
+        if (IsKeyPressed(KEY_RIGHT_CONTROL))
+            return PlayerMove{MoveType::kDrop, PlayerType::kPlayer2};
+    }
 
     return std::nullopt;
 }
 
-void Game::UpdateGameStart(const MoveType input) {
+template <std::uint8_t N>
+requires ValidPlayerCount<N>
+void Game<N>::UpdateGameStart(const MoveType input) {
     if (input == MoveType::kUp) {
         ++this->start_level_;
     }
@@ -125,7 +142,9 @@ void Game::UpdateGameStart(const MoveType input) {
     }
 }
 
-void Game::DrawStartScreen() const {
+template <std::uint8_t N>
+requires ValidPlayerCount<N>
+void Game<N>::DrawStartScreen() const {
     char buffer[2048];
     std::sprintf(buffer, "START LEVEL: %ld", this->start_level_);
     float x = this->kScreenWidth_ / 2.0f;
@@ -177,7 +196,9 @@ void Game::DrawStartScreen() const {
     game::DrawString(this->font_, this->font_.baseSize, "RIGHT CONTROL", x2 + 120, y2, TextAlignment::kLeft, WHITE);
 }
 
-void Game::UpdateGameOver(const MoveType input) {
+template <std::uint8_t N>
+requires ValidPlayerCount<N>
+void Game<N>::UpdateGameOver(const MoveType input) {
     if (input == MoveType::kConfirm) {
         for (const auto& player: players_) {
             player->GameOver();

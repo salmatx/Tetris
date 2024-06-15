@@ -1,5 +1,6 @@
 #include <cassert>
 #include <random>
+#include <iostream>
 #include "board.h"
 
 namespace game {
@@ -444,6 +445,15 @@ void Board::PlayGame() {
 
 void Board::GameOver() {
     this->SetNextGamePhase(GameState::kGameOverPhase);
+}
+
+json Board::SaveToJson(std::string_view path) {
+    json doc;
+    doc["points"] = this->points_;
+    doc["level"] = this->level_;
+    doc["board"] = this->board_;
+    std::cout << doc.dump(2);
+    return doc;
 }
 
 }
