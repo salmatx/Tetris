@@ -246,7 +246,8 @@ void DrawString(Font font, float font_size, const char* msg, size_t x, size_t y,
 
 std::string OpenFileExplorer(bool option_file) {
     if (option_file) {
-        const char* filePath = tinyfd_openFileDialog("Select a file", "", 0, nullptr, nullptr, 0);
+        const char* filePath = tinyfd_openFileDialog("Select a file", "", 0,
+                                                     nullptr, nullptr, 0);
         if (filePath) {
             return {filePath};
         }
@@ -292,16 +293,20 @@ bool CreateSaveFile(const std::string& directoryPath, const json &data) {
     return true;
 }
 
-void DrawMessageBox(const char* message) {
+void DrawMessageBox(const char* message, int x_pos, int y_pos) {
     bool showModal = true;
+    int width = 400;
+    int height = 200;
+    int x = x_pos - width / 2;
+    int y = y_pos - height / 2;
 
     while (showModal && !WindowShouldClose()) {
         BeginDrawing();
         ClearBackground(BLACK);
 
-        DrawRectangle(200, 200, 400, 200, DARKGRAY);
-        DrawText(message, 250, 250, 20, WHITE);
-        DrawText("Press Enter to continue...", 250, 310, 20, LIGHTGRAY);
+        DrawRectangle(x, y, width, height, DARKGRAY);
+        DrawText(message, x + 50, y + 50, 20, WHITE);
+        DrawText("Press Enter to continue...", x + 50, y + 110, 20, LIGHTGRAY);
 
         if (IsKeyPressed(KEY_ENTER)) {
             showModal = false;
@@ -322,9 +327,11 @@ requires ValidPlayerCount<N>json Game<N>::SaveToJson() {
     std::string path = OpenFileExplorer(false);
     if (!path.empty()) {
         if (CreateSaveFile(path, doc)) {
-            DrawMessageBox("File saved successfully!");
+            DrawMessageBox("File saved successfully!", this->kScreenWidth_ / 2,
+                           this->kScreenHeight_ / 2);
         } else {
-            DrawMessageBox("Saving error!");
+            DrawMessageBox("Saving error!", this->kScreenWidth_ / 2,
+                           this->kScreenHeight_ / 2);
         }
     }
     return doc;
