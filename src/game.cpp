@@ -1,8 +1,13 @@
 #include <cstdio>
 #include <iostream>
+#include <filesystem>
+#include <fstream>
 #include "game.h"
+#include "lib/tinyfiledialogs.h"
 
 namespace game {
+
+namespace fs = std::filesystem;
 
 template class Game<1>;
 template class Game<2>;
@@ -239,15 +244,89 @@ void DrawString(Font font, float font_size, const char* msg, size_t x, size_t y,
     DrawTextEx(font, msg, position, font_size, spacing, color);
 }
 
+std::string OpenFileExplorer(bool option_file) {
+    if (option_file) {
+        const char* filePath = tinyfd_openFileDialog("Select a file", "", 0, nullptr, nullptr, 0);
+        if (filePath) {
+            return {filePath};
+        }
+    }
+    else {
+        const char* folderPath = tinyfd_selectFolderDialog("Select a folder", "");
+        if (folderPath) {
+            return {folderPath};
+        }
+    }
+
+    return "";
+}
+
+std::string GenerateSaveFileName(const std::string& directoryPath) {
+    int fileNumber = 1;
+    std::string baseName = "tetris_save_";
+    std::string extension = ".json";
+    std::ostringstream fileName;
+
+    do {
+        fileName.str("");
+        fileName << baseName << std::setw(2) << std::setfill('0') << fileNumber << extension;
+        ++fileNumber;
+    } while (fs::exists(fs::path(directoryPath) / fileName.str()));
+
+    return (fs::path(directoryPath) / fileName.str()).string();
+}
+
+bool CreateSaveFile(const std::string& directoryPath, const json &data) {
+    std::string saveFileName = GenerateSaveFileName(directoryPath);
+
+    std::ofstream ofs(saveFileName);
+    if (!ofs) {
+        std::cerr << "Failed to create file: " << saveFileName << std::endl;
+        return false;
+    }
+
+    ofs << data;
+    ofs.close();
+
+    std::cout << "File created: " << saveFileName << std::endl;
+    return true;
+}
+
+void DrawMessageBox(const char* message) {
+    bool showModal = true;
+
+    while (showModal && !WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(BLACK);
+
+        DrawRectangle(200, 200, 400, 200, DARKGRAY);
+        DrawText(message, 250, 250, 20, WHITE);
+        DrawText("Press Enter to continue...", 250, 310, 20, LIGHTGRAY);
+
+        if (IsKeyPressed(KEY_ENTER)) {
+            showModal = false;
+        }
+
+        EndDrawing();
+    }
+}
+
 template<std::uint8_t N>
-requires ValidPlayerCount<N>json Game<N>::SaveToJson(std::string_view path) {
+requires ValidPlayerCount<N>json Game<N>::SaveToJson() {
     json doc;
     for (int i = 0; i < N; ++i) {
         auto tmp = dynamic_cast<ISaveService*>(this->players_.at(i));
         std::string key = "Player" + std::to_string(i);
-        doc[key] = tmp->SaveToJson(path);
+        doc[key] = tmp->SaveToJson();
     }
-    std::cout << doc.dump(2);
+    std::string path = OpenFileExplorer(false);
+    if (!path.empty()) {
+        if (CreateSaveFile(path, doc)) {
+            DrawMessageBox("File saved successfully!");
+        } else {
+            DrawMessageBox("Saving error!");
+        }
+    }
     return doc;
 }
 
@@ -263,7 +342,7 @@ requires ValidPlayerCount<N>void Game<N>::PauseGame() {
                      "DO YOU WANT TO SAVE GAME?     Y/N", x, y, TextAlignment::kCenter,
                      WHITE);
     if (IsKeyPressed(KEY_Y)) {
-        this->SaveToJson("");
+        this->SaveToJson();
         this->game_phase_ = GameState::kGamePlayPhase;
     }
     if (IsKeyPressed(KEY_N)) {

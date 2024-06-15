@@ -447,7 +447,7 @@ void Board::GameOver() {
     this->SetNextGamePhase(GameState::kGameOverPhase);
 }
 
-json Board::SaveToJson(std::string_view path) {
+json Board::SaveToJson() {
     json doc;
     doc["points"] = this->points_;
     doc["level"] = this->level_;

@@ -33,7 +33,7 @@ public:
     void InitRenderer() override;
     void GameLoop() override;
     std::optional<PlayerMove> GetMoveType() const override;
-    json SaveToJson(std::string_view path) override;
+    json SaveToJson() override;
 
 private:
     const size_t kScreenHeight_;

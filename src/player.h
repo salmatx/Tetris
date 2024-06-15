@@ -17,7 +17,7 @@ public:
     void StartGame() override;
     void PlayGame() override;
     void GameOver() override;
-    json SaveToJson(std::string_view path) override;
+    json SaveToJson() override;
 
 private:
     const int kGridSize_ = 30;

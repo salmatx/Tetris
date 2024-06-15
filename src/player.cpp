@@ -166,9 +166,9 @@ void Player::GameOver() {
     this->board_.GameOver();
 }
 
-json Player::SaveToJson(std::string_view path) {
+json Player::SaveToJson() {
     auto tmp = dynamic_cast<ISaveService*>(&this->board_);
-    return tmp->SaveToJson(path);
+    return tmp->SaveToJson();
 }
 
 }
