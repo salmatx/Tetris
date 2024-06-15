@@ -4,12 +4,6 @@ namespace game {
 
 ColorScheme::ColorScheme(ColorSchemes color_scheme, uint8_t shade) {
     switch (color_scheme) {
-        case ColorSchemes::kWhite:
-            this->color_ = Schemes::white_color[0];
-            break;
-        case ColorSchemes::kBlack:
-            this->color_ = Schemes::black_color[0];
-            break;
         case ColorSchemes::kBaseColors:
             this->color_ = Schemes::base_colors[shade];
             break;

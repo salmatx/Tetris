@@ -80,21 +80,21 @@ void Board::RotatePiece() {
     }
 }
 
-void Board::MovePiece(const MoveTypes move) {
+void Board::MovePiece(const MoveType move) {
     switch (move) {
-        case MoveTypes::kLeft:
+        case MoveType::kLeft:
             this->MovePieceLeft();
             break;
-        case MoveTypes::kRight:
+        case MoveType::kRight:
             this->MovePieceRight();
             break;
-        case MoveTypes::kUp:
+        case MoveType::kUp:
             this->RotatePiece();
             break;
-        case MoveTypes::kDown:
+        case MoveType::kDown:
             SoftDrop();
             break;
-        case MoveTypes::kSpace:
+        case MoveType::kDrop:
             HardDrop();
         default:
             break;
@@ -253,14 +253,15 @@ int Board::GetShadowPieceRowPosition(){
     return shadow_piece.offset_row;
 }
 
-void Board::UpdateGame(MoveTypes input) {
+GameState Board::UpdateGame(MoveType input, GameState game_state) {
+    this->game_phase_ = game_state;
     this->current_time_ = std::chrono::steady_clock::now();
     this->time_duration_ =
             std::chrono::duration_cast<std::chrono::duration<float>>
                     (this->current_time_ -this->start_time_).count();
     switch (this->game_phase_) {
         case GameState::kGameStartPhase:
-            this->UpdateGameStart(input);
+            this->UpdateGameStart();
             break;
         case GameState::kGamePlayPhase:
             this->UpdateGameplay(input);
@@ -272,6 +273,8 @@ void Board::UpdateGame(MoveTypes input) {
             this->UpdateGameOver(input);
             break;
     }
+
+    return this->game_phase_;
 }
 
 GameState Board::GetActualGamePhase() const {
@@ -290,7 +293,7 @@ size_t Board::GetPoints() const {
     return this->points_;
 }
 
-void Board::UpdateGameplay(const MoveTypes input) {
+void Board::UpdateGameplay(const MoveType input) {
     this->MovePiece(input);
     if (this->time_duration_ >= this->next_drop_time_) {
         this->SetNextDrop();
@@ -313,23 +316,14 @@ void Board::SetNextDrop() {
     }
 }
 
-void Board::UpdateGameStart(const MoveTypes input) {
-    if (input == MoveTypes::kUp) {
-        ++this->start_level_;
-    }
-    if (input == MoveTypes::kDown && this->start_level_ > 0) {
-        --this->start_level_;
-    }
-    if (input == MoveTypes::kSpace) {
-        this->level_ = this->start_level_;
-        this->points_ = 0;
-        this->start_time_ = std::chrono::steady_clock::now();
-        this->SetNextGamePhase(GameState::kGamePlayPhase);
-    }
+void Board::UpdateGameStart() {
+    this->level_ = this->start_level_;
+    this->points_ = 0;
+    this->start_time_ = std::chrono::steady_clock::now();
 }
 
-void Board::UpdateGameOver(const MoveTypes input) {
-    if (input == MoveTypes::kSpace) {
+void Board::UpdateGameOver(const MoveType input) {
+    if (input == MoveType::kDrop) {
         this->SetNextGamePhase(GameState::kGameStartPhase);
         this->BoardClean();
     }
@@ -438,6 +432,10 @@ Board& Board::operator=(const Board& other) {
     std::swap(this->current_time_, tmp.current_time_);
 
     return *this;
+}
+
+void Board::SetStartLevel(size_t level) {
+    this->start_level_ = level;
 }
 
 }

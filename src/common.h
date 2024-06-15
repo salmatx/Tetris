@@ -1,9 +1,11 @@
 #pragma once
 
+#include <raylib.h>
+
 namespace game {
 
-enum class MoveTypes {
-    kLeft, kRight, kUp, kDown, kSpace
+enum class MoveType {
+    kLeft, kRight, kUp, kDown, kDrop, kConfirm, kNone
 };
 
 enum class Shape {
@@ -21,5 +23,17 @@ enum class TextAlignment {
 enum class PieceType {
     kActualPiece, kNextPiece
 };
+
+enum class PlayerType {
+    kPlayer1, kPlayer2, kPlayerNone
+};
+
+struct PlayerMove {
+    MoveType moveType;
+    PlayerType player;
+};
+
+inline Color kBackgroundColor = BLACK;
+inline const char* font_type = "../src/fonts/novem___.ttf";
 
 }

@@ -22,11 +22,12 @@ public:
     std::vector<std::vector<uint8_t>> GetBoard() const override;
     size_t GetClearedLineCount() const override;
     bool IsLineClearing(int index) const override;
-    void UpdateGame(MoveTypes input) override;
+    GameState UpdateGame(MoveType input, GameState game_state) override;
     GameState GetActualGamePhase() const override;
     size_t GetStartLevel() const override;
     size_t GetLevel() const override;
     size_t GetPoints() const override;
+    void SetStartLevel(size_t level) override;
 
 private:
     struct PieceState {
@@ -58,11 +59,11 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> start_time_{};
     std::chrono::time_point<std::chrono::steady_clock> current_time_{};
 
-    void UpdateGameplay(const MoveTypes input);
-    void UpdateGameStart(const MoveTypes);
-    void UpdateGameOver(const MoveTypes input);
+    void UpdateGameplay(const MoveType input);
+    void UpdateGameStart();
+    void UpdateGameOver(const MoveType input);
     void UpdateGameLines();
-    void MovePiece(const MoveTypes move);
+    void MovePiece(const MoveType move);
     void MovePieceLeft();
     void MovePieceRight();
     void RotatePiece();

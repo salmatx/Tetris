@@ -5,7 +5,7 @@
 namespace game {
 
 enum class ColorSchemes {
-    kWhite, kBlack, kBaseColors, kLightColors, kDarkColors
+    kBaseColors, kLightColors, kDarkColors
 };
 
 class ColorScheme {
@@ -27,12 +27,6 @@ private:
     RGBA color_;
 
     struct Schemes {
-        static constexpr RGBA white_color[]{
-                {0xFF, 0xFF, 0xFF, 0xFF}
-        };
-        static constexpr RGBA black_color[] = {
-                {0x00, 0x00, 0x00, 0x00}
-        };
         static constexpr RGBA base_colors[] = {
                 {0x28, 0x28, 0x28, 0xFF},
                 {0x2D, 0x99, 0x99, 0xFF},
