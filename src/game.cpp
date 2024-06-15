@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <iostream>
 #include "game.h"
 
 namespace game {
@@ -69,6 +70,14 @@ void Game<N>::GameLoop() {
                         }
                         break;
                 }
+
+                if (input.moveType == MoveType::kPause) {
+                    this->game_phase_ = GameState::kGamePause;
+                }
+                break;
+
+            case GameState::kGamePause:
+                this->PauseGame();
                 break;
         }
 
@@ -92,6 +101,8 @@ requires ValidPlayerCount<N>
 std::optional<PlayerMove> Game<N>::GetMoveType() const {
     if (IsKeyPressed(KEY_ENTER))
         return PlayerMove{MoveType::kConfirm, PlayerType::kPlayer1};
+    if (IsKeyPressed(KEY_P))
+        return PlayerMove{MoveType::kPause, PlayerType::kPlayer1};
 
     if (IsKeyPressed(KEY_A))
         return PlayerMove{MoveType::kLeft, PlayerType::kPlayer1};
@@ -227,4 +238,37 @@ void DrawString(Font font, float font_size, const char* msg, size_t x, size_t y,
     Vector2 position = {x_pos, y_pos};
     DrawTextEx(font, msg, position, font_size, spacing, color);
 }
+
+template<std::uint8_t N>
+requires ValidPlayerCount<N>json Game<N>::SaveToJson(std::string_view path) {
+    json doc;
+    for (int i = 0; i < N; ++i) {
+        auto tmp = dynamic_cast<ISaveService*>(this->players_.at(i));
+        std::string key = "Player" + std::to_string(i);
+        doc[key] = tmp->SaveToJson(path);
+    }
+    std::cout << doc.dump(2);
+    return doc;
+}
+
+template<std::uint8_t N>
+requires ValidPlayerCount<N>void Game<N>::PauseGame() {
+    size_t x = this->kScreenWidth_ / 2;
+    size_t y = this->kScreenHeight_ / 2 - 80;
+    game::DrawString(this->font_, this->font_.baseSize * 2.5,
+                     "GAME PAUSED", x, y, TextAlignment::kCenter,
+                     WHITE);
+    y += 60;
+    game::DrawString(this->font_, this->font_.baseSize * 2.5,
+                     "DO YOU WANT TO SAVE GAME?     Y/N", x, y, TextAlignment::kCenter,
+                     WHITE);
+    if (IsKeyPressed(KEY_Y)) {
+        this->SaveToJson("");
+        this->game_phase_ = GameState::kGamePlayPhase;
+    }
+    if (IsKeyPressed(KEY_N)) {
+        this->game_phase_ = GameState::kGamePlayPhase;
+    }
+}
+
 }

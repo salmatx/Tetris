@@ -8,6 +8,7 @@
 #include <cstdint>
 #include "i_game.h"
 #include "i_player.h"
+#include "i_save_service.h"
 
 namespace game {
 
@@ -19,7 +20,7 @@ concept ValidPlayerCount = (N == 1 || N == 2);
 
 template <std::uint8_t N>
 requires ValidPlayerCount<N>
-class Game : public IGame{
+class Game : public IGame, public ISaveService{
 public:
     template<typename... T>
     requires (IsPlayer<T>&&...) && (sizeof...(T) == N)
@@ -32,6 +33,7 @@ public:
     void InitRenderer() override;
     void GameLoop() override;
     std::optional<PlayerMove> GetMoveType() const override;
+    json SaveToJson(std::string_view path) override;
 
 private:
     const size_t kScreenHeight_;
@@ -47,6 +49,7 @@ private:
     void UpdateGameStart(const MoveType input);
     void UpdateGameOver(const MoveType input);
     void DrawStartScreen() const;
+    void PauseGame();
 };
 
 void DrawString(Font font, float font_size, const char* msg, size_t x, size_t y, TextAlignment alignment, Color color);

@@ -7,7 +7,7 @@
 
 namespace game {
 
-class Player : public IPlayer{
+class Player : public IPlayer, public ISaveService{
 public:
     explicit Player(IBoard &board, const int x_offset);
     void DrawPlayer() const override;
@@ -17,6 +17,7 @@ public:
     void StartGame() override;
     void PlayGame() override;
     void GameOver() override;
+    json SaveToJson(std::string_view path) override;
 
 private:
     const int kGridSize_ = 30;

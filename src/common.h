@@ -5,7 +5,7 @@
 namespace game {
 
 enum class MoveType {
-    kLeft, kRight, kUp, kDown, kDrop, kConfirm, kNone
+    kLeft, kRight, kUp, kDown, kDrop, kConfirm, kPause, kNone
 };
 
 enum class Shape {
@@ -13,7 +13,7 @@ enum class Shape {
 };
 
 enum class GameState {
-    kGameStartPhase, kGamePlayPhase, kGameLinePhase, kGameOverPhase
+    kGameStartPhase, kGamePlayPhase, kGameLinePhase, kGameOverPhase, kGamePause
 };
 
 enum class TextAlignment {

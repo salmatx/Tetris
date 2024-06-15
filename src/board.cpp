@@ -452,7 +452,6 @@ json Board::SaveToJson(std::string_view path) {
     doc["points"] = this->points_;
     doc["level"] = this->level_;
     doc["board"] = this->board_;
-    std::cout << doc.dump(2);
     return doc;
 }
 
