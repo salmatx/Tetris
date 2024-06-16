@@ -28,13 +28,13 @@ public:
         : kScreenHeight_(screen_height),
          kScreenWidth_(screen_width),
          players_{&players...},
-         font_type_(font){};
+         font_type_(font){}
     ~Game() override;
     void InitRenderer() override;
     void GameLoop() override;
-    std::optional<PlayerMove> GetMoveType() const override;
+    [[nodiscard]] std::optional<PlayerMove> GetMoveType() const override;
     json SaveToJson() override;
-    void LoadFromJson(json obj) override;
+    bool LoadFromJson(json obj) override;
 
 private:
     const size_t kScreenHeight_;
@@ -42,7 +42,7 @@ private:
     const char* kTitle_ = "Tetris";
     const std::array<IPlayer*, N> players_;
     const char* font_type_;
-    Font font_;
+    Font font_{};
     size_t start_level_ = 0;
     GameState game_phase_ = GameState::kGameStartPhase;
 

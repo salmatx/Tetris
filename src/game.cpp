@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include "game.h"
-#include "lib/tinyfiledialogs.h"
+#include "tinyfiledialogs.h"
 
 namespace game {
 
@@ -138,7 +138,7 @@ template <std::uint8_t N>
 requires ValidPlayerCount<N>
 void Game<N>::GameLoop() {
     while (!WindowShouldClose()) {
-        PlayerMove input;
+        PlayerMove input{};
         try {
             input = this->GetMoveType().value();
         }
@@ -267,10 +267,11 @@ void Game<N>::UpdateGameStart(const MoveType input) {
             player->StartGame();
             player->UpdatePlayer(MoveType::kNone);
         }
-        this->LoadFromJson({});
-        this->game_phase_ = GameState::kGamePlayPhase;
-        for (const auto &player : players_) {
-            player->PlayGame();
+        if (this->LoadFromJson({})) {
+            this->game_phase_ = GameState::kGamePlayPhase;
+            for (const auto &player : players_) {
+                player->PlayGame();
+            }
         }
     }
 }
@@ -387,11 +388,11 @@ requires ValidPlayerCount<N>void Game<N>::PauseGame() {
 }
 
 template<std::uint8_t N>
-requires ValidPlayerCount<N>void Game<N>::LoadFromJson(json obj) {
+requires ValidPlayerCount<N>bool Game<N>::LoadFromJson(json ) {
     std::string path = OpenFileExplorer();
     if (path.empty()) {
         std::cerr << "No file selected." << std::endl;
-        return;
+        return false;
     }
     std::string file = ReadFileContents(path);
     json doc;
@@ -400,7 +401,7 @@ requires ValidPlayerCount<N>void Game<N>::LoadFromJson(json obj) {
     }
     catch (const json::parse_error& e) {
         std::cerr << "Parse error: " << e.what() << std::endl;
-        return;
+        return false;
     }
     for (int i = 0; i < N; ++i) {
         std::string key = "Player" + std::to_string(i);
@@ -409,6 +410,7 @@ requires ValidPlayerCount<N>void Game<N>::LoadFromJson(json obj) {
             player->LoadFromJson(doc[key]);
         }
     }
+    return true;
 }
 
 }

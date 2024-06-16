@@ -17,7 +17,12 @@ add_compile_options(-Wall -Wextra -pedantic)
 
 set (source_dir "${PROJECT_SOURCE_DIR}/src")
 
-file(GLOB source_files "${source_dir}/*.cpp")
+file(GLOB source_files
+        "${source_dir}/*.cpp"
+        "${source_dir}/lib/*.cpp"
+)
+
+include_directories(${source_dir}/lib)
 
 add_executable(Tetris ${source_files}
         src/lib/tinyfiledialogs.cpp)

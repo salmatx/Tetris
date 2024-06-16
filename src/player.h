@@ -18,7 +18,7 @@ public:
     void PlayGame() override;
     void GameOver() override;
     json SaveToJson() override;
-    void LoadFromJson(json obj) override;
+    bool LoadFromJson(json obj) override;
 
 private:
     const int kGridSize_ = 30;

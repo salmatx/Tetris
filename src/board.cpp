@@ -1,6 +1,5 @@
 #include <cassert>
 #include <random>
-#include <iostream>
 #include "board.h"
 
 namespace game {
@@ -272,6 +271,8 @@ GameState Board::UpdateGame(MoveType input) {
         case GameState::kGameOverPhase:
             this->UpdateGameOver();
             break;
+        default:
+            break;
     }
 
     return this->game_phase_;
@@ -456,7 +457,7 @@ json Board::SaveToJson() {
     return doc;
 }
 
-void Board::LoadFromJson(json obj) {
+bool Board::LoadFromJson(json obj) {
     if (obj.contains("board")) {
         this->board_ = obj["board"].get<typeof(this->board_)>();
     }
@@ -469,6 +470,8 @@ void Board::LoadFromJson(json obj) {
     if (obj.contains("cleared lines")) {
         this->cleared_line_count_ = obj["cleared lines"].get<typeof(this->cleared_line_count_)>();
     }
+
+    return true;
 }
 
 }
