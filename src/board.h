@@ -33,6 +33,7 @@ public:
     void PlayGame() override;
     void GameOver() override;
     json SaveToJson() override;
+    void LoadFromJson(json obj) override;
 
 private:
     struct PieceState {

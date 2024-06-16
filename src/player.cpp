@@ -171,4 +171,9 @@ json Player::SaveToJson() {
     return tmp->SaveToJson();
 }
 
+void Player::LoadFromJson(json obj) {
+    auto tmp = dynamic_cast<ISaveService*>(&this->board_);
+    tmp->LoadFromJson(obj);
+}
+
 }

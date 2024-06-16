@@ -450,9 +450,25 @@ void Board::GameOver() {
 json Board::SaveToJson() {
     json doc;
     doc["points"] = this->points_;
+    doc["cleared lines"] = this->cleared_line_count_;
     doc["level"] = this->level_;
     doc["board"] = this->board_;
     return doc;
+}
+
+void Board::LoadFromJson(json obj) {
+    if (obj.contains("board")) {
+        this->board_ = obj["board"].get<typeof(this->board_)>();
+    }
+    if (obj.contains("level")) {
+        this->level_ = obj["level"].get<typeof(this->level_)>();
+    }
+    if (obj.contains("points")) {
+        this->points_ = obj["points"].get<typeof(this->points_)>();
+    }
+    if (obj.contains("cleared lines")) {
+        this->cleared_line_count_ = obj["cleared lines"].get<typeof(this->cleared_line_count_)>();
+    }
 }
 
 }

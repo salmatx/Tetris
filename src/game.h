@@ -34,6 +34,7 @@ public:
     void GameLoop() override;
     std::optional<PlayerMove> GetMoveType() const override;
     json SaveToJson() override;
+    void LoadFromJson(json obj) override;
 
 private:
     const size_t kScreenHeight_;
